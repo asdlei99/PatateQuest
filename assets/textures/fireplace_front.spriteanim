@@ -1,0 +1,12 @@
+<sheet texture="fireplace_front.png" spriteWidth="48" spriteHeight="16" originX="0" originY="0">
+  <anim name="idle" fps="5" loop="true">
+    <frame id="0"/>
+    <frame id="1"/>
+    <frame id="2"/>
+    <frame id="3"/>
+    <frame id="2"/>
+    <frame id="0"/>
+    <frame id="1"/>
+    <frame id="2"/>
+  </anim>
+</sheet>

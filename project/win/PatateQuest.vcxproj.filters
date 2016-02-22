@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\Board.cpp" />
+    <ClCompile Include="..\..\src\Eboulis.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Entity.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Stairs.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\LargeEboulis.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Tombe.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Table.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Bibliotheque.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Buffet.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PupitreDeSorcier.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Cheminee.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Trone.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Coffre.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Chevalet.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\RatelierDArmes.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PorteFermee.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Oubliette.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PorteSecrete.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EtabliDAlchimiste.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Room.cpp" />
+    <ClCompile Include="..\..\src\Charactere.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Barbare.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Porte.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PorteOuverte.cpp">
+      <Filter>entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Die.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\Board.h" />
+    <ClInclude Include="..\..\src\Eboulis.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Entity.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Stairs.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\LargeEboulis.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Tombe.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Table.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Bibliotheque.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Buffet.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PupitreDeSorcier.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Cheminee.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Trone.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Coffre.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Chevalet.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\RatelierDArmes.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PorteFermee.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Oubliette.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PorteSecrete.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\EtabliDAlchimiste.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Room.h" />
+    <ClInclude Include="..\..\src\Charactere.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Barbare.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Porte.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PorteOuverte.h">
+      <Filter>entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Die.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="entities">
+      <UniqueIdentifier>{90d51122-b402-4f89-9d78-108241073d78}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

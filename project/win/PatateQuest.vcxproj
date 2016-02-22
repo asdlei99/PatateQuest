@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5DCB417E-BDEC-474E-8226-DFA44EC7912A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PatateQuest</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>../../onut/include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>../../onut/include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Barbare.cpp" />
+    <ClCompile Include="..\..\src\Bibliotheque.cpp" />
+    <ClCompile Include="..\..\src\Board.cpp" />
+    <ClCompile Include="..\..\src\Buffet.cpp" />
+    <ClCompile Include="..\..\src\Charactere.cpp" />
+    <ClCompile Include="..\..\src\Cheminee.cpp" />
+    <ClCompile Include="..\..\src\Chevalet.cpp" />
+    <ClCompile Include="..\..\src\Coffre.cpp" />
+    <ClCompile Include="..\..\src\Die.cpp" />
+    <ClCompile Include="..\..\src\Eboulis.cpp" />
+    <ClCompile Include="..\..\src\Entity.cpp" />
+    <ClCompile Include="..\..\src\EtabliDAlchimiste.cpp" />
+    <ClCompile Include="..\..\src\LargeEboulis.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\Oubliette.cpp" />
+    <ClCompile Include="..\..\src\Porte.cpp" />
+    <ClCompile Include="..\..\src\PorteFermee.cpp" />
+    <ClCompile Include="..\..\src\PorteOuverte.cpp" />
+    <ClCompile Include="..\..\src\PorteSecrete.cpp" />
+    <ClCompile Include="..\..\src\PupitreDeSorcier.cpp" />
+    <ClCompile Include="..\..\src\RatelierDArmes.cpp" />
+    <ClCompile Include="..\..\src\Room.cpp" />
+    <ClCompile Include="..\..\src\Stairs.cpp" />
+    <ClCompile Include="..\..\src\Table.cpp" />
+    <ClCompile Include="..\..\src\Tombe.cpp" />
+    <ClCompile Include="..\..\src\Trone.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\onut\project\win\onut.vcxproj">
+      <Project>{5a0e49d2-55f1-4ab5-94f6-d19f308ecc46}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\Barbare.h" />
+    <ClInclude Include="..\..\src\Bibliotheque.h" />
+    <ClInclude Include="..\..\src\Board.h" />
+    <ClInclude Include="..\..\src\Buffet.h" />
+    <ClInclude Include="..\..\src\Charactere.h" />
+    <ClInclude Include="..\..\src\Cheminee.h" />
+    <ClInclude Include="..\..\src\Chevalet.h" />
+    <ClInclude Include="..\..\src\Coffre.h" />
+    <ClInclude Include="..\..\src\Die.h" />
+    <ClInclude Include="..\..\src\Eboulis.h" />
+    <ClInclude Include="..\..\src\Entity.h" />
+    <ClInclude Include="..\..\src\EtabliDAlchimiste.h" />
+    <ClInclude Include="..\..\src\LargeEboulis.h" />
+    <ClInclude Include="..\..\src\Oubliette.h" />
+    <ClInclude Include="..\..\src\Porte.h" />
+    <ClInclude Include="..\..\src\PorteFermee.h" />
+    <ClInclude Include="..\..\src\PorteOuverte.h" />
+    <ClInclude Include="..\..\src\PorteSecrete.h" />
+    <ClInclude Include="..\..\src\PupitreDeSorcier.h" />
+    <ClInclude Include="..\..\src\RatelierDArmes.h" />
+    <ClInclude Include="..\..\src\Room.h" />
+    <ClInclude Include="..\..\src\Stairs.h" />
+    <ClInclude Include="..\..\src\Table.h" />
+    <ClInclude Include="..\..\src\Tombe.h" />
+    <ClInclude Include="..\..\src\Trone.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

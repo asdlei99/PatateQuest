@@ -1,0 +1,50 @@
+<sheet texture="barbare.png" spriteWidth="16" spriteHeight="32" originX="0" originY="18">
+  <anim name="idle_front" fps="5" loop="true">
+    <frame id="0" repeat="2"/>
+    <frame id="1" repeat="1"/>
+    <frame id="2" repeat="1"/>
+    <frame id="3" repeat="1"/>
+  </anim>
+  <anim name="run_front" fps="12" loop="true">
+    <frame id="4" repeat="1"/>
+    <frame id="5" repeat="1"/>
+    <frame id="6" repeat="1"/>
+    <frame id="7" repeat="1"/>
+  </anim>
+  <anim name="idle_left" fps="5" loop="true">
+    <frame id="16" repeat="2"/>
+    <frame id="17" repeat="1"/>
+    <frame id="18" repeat="1"/>
+    <frame id="19" repeat="1"/>
+  </anim>
+  <anim name="run_left" fps="12" loop="true">
+    <frame id="20" repeat="1"/>
+    <frame id="21" repeat="1"/>
+    <frame id="22" repeat="1"/>
+    <frame id="23" repeat="1"/>
+  </anim>
+  <anim name="idle_back" fps="5" loop="true">
+    <frame id="32" repeat="2"/>
+    <frame id="33" repeat="1"/>
+    <frame id="34" repeat="1"/>
+    <frame id="35" repeat="1"/>
+  </anim>
+  <anim name="run_back" fps="12" loop="true">
+    <frame id="36" repeat="1"/>
+    <frame id="37" repeat="1"/>
+    <frame id="38" repeat="1"/>
+    <frame id="39" repeat="1"/>
+  </anim>
+  <anim name="idle_right" fps="5" loop="true">
+    <frame id="48" repeat="2"/>
+    <frame id="49" repeat="1"/>
+    <frame id="50" repeat="1"/>
+    <frame id="51" repeat="1"/>
+  </anim>
+  <anim name="run_right" fps="12" loop="true">
+    <frame id="52" repeat="1"/>
+    <frame id="53" repeat="1"/>
+    <frame id="54" repeat="1"/>
+    <frame id="55" repeat="1"/>
+  </anim>
+</sheet>

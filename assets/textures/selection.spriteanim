@@ -1,0 +1,6 @@
+<sheet texture="selection.png" spriteWidth="20" spriteHeight="21" originX="2" originY="3">
+  <anim name="idle" fps="4" loop="true">
+    <frame id="0"/>
+    <frame id="1"/>
+  </anim>
+</sheet>

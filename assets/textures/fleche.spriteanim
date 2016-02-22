@@ -1,0 +1,8 @@
+<sheet texture="fleche.png" spriteWidth="12" spriteHeight="17" originX="-2" originY="7">
+  <anim name="idle" fps="12" loop="true">
+    <frame id="1" pepeat="2"/>
+    <frame id="0" repeat="4"/>
+    <frame id="1" pepeat="2"/>
+    <frame id="2" repeat="6"/>
+  </anim>
+</sheet>
