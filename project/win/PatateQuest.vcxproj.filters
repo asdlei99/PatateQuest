@@ -3,149 +3,160 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Board.cpp" />
-    <ClCompile Include="..\..\src\Eboulis.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Entity.cpp">
       <Filter>entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Stairs.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\LargeEboulis.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Tombe.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Table.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\Room.cpp" />
+    <ClCompile Include="..\..\src\Die.cpp" />
+    <ClCompile Include="..\..\src\Game.cpp" />
+    <ClCompile Include="..\..\src\Barbare.cpp">
+      <Filter>entities\characteres</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Bibliotheque.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Buffet.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\PupitreDeSorcier.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\Charactere.cpp">
+      <Filter>entities\characteres</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Cheminee.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Trone.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Coffre.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Chevalet.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\RatelierDArmes.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\Coffre.cpp">
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\PorteFermee.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Oubliette.cpp">
-      <Filter>entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\PorteSecrete.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\Eboulis.cpp">
+      <Filter>entities\tuiles</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EtabliDAlchimiste.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Room.cpp" />
-    <ClCompile Include="..\..\src\Charactere.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\LargeEboulis.cpp">
+      <Filter>entities\tuiles</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Barbare.cpp">
-      <Filter>entities</Filter>
+    <ClCompile Include="..\..\src\Oubliette.cpp">
+      <Filter>entities\tuiles</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Porte.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PorteFermee.cpp">
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\PorteOuverte.cpp">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Die.cpp" />
+    <ClCompile Include="..\..\src\PorteSecrete.cpp">
+      <Filter>entities\tuiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PupitreDeSorcier.cpp">
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\RatelierDArmes.cpp">
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Stairs.cpp">
+      <Filter>entities\tuiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Table.cpp">
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Tombe.cpp">
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Trone.cpp">
+      <Filter>entities\mobilier</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Board.h" />
-    <ClInclude Include="..\..\src\Eboulis.h">
-      <Filter>entities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Entity.h">
       <Filter>entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Stairs.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\LargeEboulis.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Tombe.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Table.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\Room.h" />
+    <ClInclude Include="..\..\src\Die.h" />
+    <ClInclude Include="..\..\src\Game.h" />
+    <ClInclude Include="..\..\src\Barbare.h">
+      <Filter>entities\characteres</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Bibliotheque.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Buffet.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\PupitreDeSorcier.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\Charactere.h">
+      <Filter>entities\characteres</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Cheminee.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Trone.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Coffre.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Chevalet.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\RatelierDArmes.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\Coffre.h">
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\PorteFermee.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Oubliette.h">
-      <Filter>entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\PorteSecrete.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\Eboulis.h">
+      <Filter>entities\tuiles</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\EtabliDAlchimiste.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Room.h" />
-    <ClInclude Include="..\..\src\Charactere.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\LargeEboulis.h">
+      <Filter>entities\tuiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Barbare.h">
-      <Filter>entities</Filter>
+    <ClInclude Include="..\..\src\Oubliette.h">
+      <Filter>entities\tuiles</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Porte.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PorteFermee.h">
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\PorteOuverte.h">
-      <Filter>entities</Filter>
+      <Filter>entities\mobilier</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Die.h" />
+    <ClInclude Include="..\..\src\PorteSecrete.h">
+      <Filter>entities\tuiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PupitreDeSorcier.h">
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\RatelierDArmes.h">
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Stairs.h">
+      <Filter>entities\tuiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Table.h">
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Tombe.h">
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Trone.h">
+      <Filter>entities\mobilier</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="entities">
       <UniqueIdentifier>{90d51122-b402-4f89-9d78-108241073d78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entities\mobilier">
+      <UniqueIdentifier>{728e45db-796f-4cb6-8885-d50c7ccffe9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entities\characteres">
+      <UniqueIdentifier>{d7070cc7-0abe-492a-b7ff-f4a6bf18344d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entities\tuiles">
+      <UniqueIdentifier>{7e8fec6b-cc7f-4c95-92f5-25ba39314260}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -88,7 +88,7 @@ private:
         Idle,
         LancerDes,
         Mouvement,
-        Busy
+        Walking
     } m_state = State::Idle;
 
     using Path = std::vector<Point>;
@@ -146,6 +146,7 @@ private:
     void updateFogOfWar();
     void makeRoomVisible(const RoomRef& pRoom);
     bool isObstructedAt(const Point& pos);
+    void drawDice();
 
     bool m_editorMode = false;
     int m_questId = 1;

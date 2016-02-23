@@ -9,4 +9,9 @@
 Barbare::Barbare(const Point& position, Direction direction)
     : Charactere("barbare.spriteanim", position, direction)
 {
+    m_attaque = 3;
+    m_defense = 2;
+    m_deplacement = 2;
+    m_esprit = 2;
+    m_corp = 8;
 }

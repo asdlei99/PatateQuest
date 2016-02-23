@@ -18,12 +18,23 @@ public:
     void render() override;
 
     void moveTo(const Point& position, const MoveCallback& callback);
-    Dice getDice() const;
     void sleep();
     void wakeUp();
+
+    int getAttaque() const;
+    int getDefense() const;
+    int getCorp() const;
+    int getEsprit() const;
+    int getDeplacement() const;
 
 protected:
     OSpriteAnimInstance m_spriteAnimInstance;
     OAnimPoint m_moveAnim;
-    Dice m_dice;
+
+    // Stats
+    int m_attaque = 0;
+    int m_defense = 0;
+    int m_corp = 1;
+    int m_esprit = 0;
+    int m_deplacement = 1;
 };

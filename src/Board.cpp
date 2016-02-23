@@ -241,7 +241,7 @@ void Board::nextTurn()
         if (pHero)
         {
             pHero->wakeUp();
-            m_playerTurn.dice = pHero->getDice();
+            m_playerTurn.dice.resize(pHero->getDeplacement());
             m_selection.pos = pHero->getPosition();
         }
     }
@@ -620,7 +620,7 @@ void Board::update()
                                     }
                                 }
                                 auto moveTo = getMouseOnBoard();
-                                m_state = State::Busy;
+                                m_state = State::Walking;
                                 pHero->moveTo(moveTo, [this, moveTo]
                                 {
                                     m_state = State::Mouvement;
@@ -939,21 +939,14 @@ void Board::render()
                 }
                 break;
             }
+            case State::Walking:
+            {
+                drawDice();
+                break;
+            }
             case State::Mouvement:
             {
-                int dieOffset = 0;
-                for (int i = 0; i < static_cast<int>(m_playerTurn.dice.size()); ++i)
-                {
-                    auto& die = m_playerTurn.dice[i];
-                    if (die)
-                    {
-                        OSB->drawRectWithUVs(m_pDiceTexture,
-                                             Rect(static_cast<float>(m_playerTurn.dicePos.x * TILE_SIZE + dieOffset * 32), static_cast<float>(m_playerTurn.dicePos.y * TILE_SIZE), 32, 32),
-                                             Vector4(0, static_cast<float>((die - 1) * 32) / 192.f, 1, static_cast<float>(die * 32) / 192.f));
-                        ++dieOffset;
-                    }
-                }
-
+                drawDice();
                 auto pHero = m_heroes[m_playerTurn.whosTurn];
                 if (pHero)
                 {
@@ -976,8 +969,48 @@ void Board::render()
                 }
                 break;
             }
+            case State::Idle:
+            {
+                auto pHero = m_heroes[m_playerTurn.whosTurn];
+                if (pHero)
+                {
+                    if (hasClosedDoor(pHero->getPosition() + Point(1, 0), pHero->getPosition()))
+                    {
+                        drawArrowAt(pHero->getPosition() + Point(1, 0));
+                    }
+                    if (hasClosedDoor(pHero->getPosition() + Point(-1, 0), pHero->getPosition()))
+                    {
+                        drawArrowAt(pHero->getPosition() + Point(-1, 0));
+                    }
+                    if (hasClosedDoor(pHero->getPosition() + Point(0, 1), pHero->getPosition()))
+                    {
+                        drawArrowAt(pHero->getPosition() + Point(0, 1));
+                    }
+                    if (hasClosedDoor(pHero->getPosition() + Point(0, -1), pHero->getPosition()))
+                    {
+                        drawArrowAt(pHero->getPosition() + Point(0, -1));
+                    }
+                }
+                break;
+            }
         }
         OSB->end();
+    }
+}
+
+void Board::drawDice()
+{
+    int dieOffset = 0;
+    for (int i = 0; i < static_cast<int>(m_playerTurn.dice.size()); ++i)
+    {
+        auto& die = m_playerTurn.dice[i];
+        if (die)
+        {
+            OSB->drawRectWithUVs(m_pDiceTexture,
+                                 Rect(static_cast<float>(m_playerTurn.dicePos.x * TILE_SIZE + dieOffset * 32), static_cast<float>(m_playerTurn.dicePos.y * TILE_SIZE), 32, 32),
+                                 Vector4(0, static_cast<float>((die - 1) * 32) / 192.f, 1, static_cast<float>(die * 32) / 192.f));
+            ++dieOffset;
+        }
     }
 }
 

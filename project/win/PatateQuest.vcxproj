@@ -95,6 +95,7 @@
     <ClCompile Include="..\..\src\Eboulis.cpp" />
     <ClCompile Include="..\..\src\Entity.cpp" />
     <ClCompile Include="..\..\src\EtabliDAlchimiste.cpp" />
+    <ClCompile Include="..\..\src\Game.cpp" />
     <ClCompile Include="..\..\src\LargeEboulis.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Oubliette.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="..\..\src\Eboulis.h" />
     <ClInclude Include="..\..\src\Entity.h" />
     <ClInclude Include="..\..\src\EtabliDAlchimiste.h" />
+    <ClInclude Include="..\..\src\Game.h" />
     <ClInclude Include="..\..\src\LargeEboulis.h" />
     <ClInclude Include="..\..\src\Oubliette.h" />
     <ClInclude Include="..\..\src\Porte.h" />

@@ -12,7 +12,6 @@ Charactere::Charactere(const std::string& spriteAnimFilename, const Point& posit
 {
     setDirection(Front);
     m_spriteAnimInstance.play("idle");
-    m_dice.resize(2);
 }
 
 void Charactere::moveTo(const Point& position, const MoveCallback& callback)
@@ -86,7 +85,27 @@ void Charactere::render()
                            m_spriteAnimInstance.getOrigin());
 }
 
-Dice Charactere::getDice() const
+int Charactere::getAttaque() const
 {
-    return m_dice;
+    return m_attaque;
+}
+
+int Charactere::getDefense() const
+{
+    return m_defense;
+}
+
+int Charactere::getCorp() const
+{
+    return m_corp;
+}
+
+int Charactere::getEsprit() const
+{
+    return m_esprit;
+}
+
+int Charactere::getDeplacement() const
+{
+    return m_deplacement;
 }
