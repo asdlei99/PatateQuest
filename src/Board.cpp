@@ -215,6 +215,14 @@ Board::Board(int questId)
 
 void Board::nextTurn()
 {
+    if (m_playerTurn.whosTurn != JOUEUR_SORCIER)
+    {
+        auto pHero = m_heroes[m_playerTurn.whosTurn];
+        if (pHero)
+        {
+            pHero->sleep();
+        }
+    }
     m_state = State::Idle;
     m_playerTurn.next();
     m_fleche.pos = {-20, -20};
@@ -232,6 +240,7 @@ void Board::nextTurn()
         auto pHero = m_heroes[m_playerTurn.whosTurn];
         if (pHero)
         {
+            pHero->wakeUp();
             m_playerTurn.dice = pHero->getDice();
             m_selection.pos = pHero->getPosition();
         }

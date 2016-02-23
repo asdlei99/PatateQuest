@@ -10,7 +10,8 @@ Charactere::Charactere(const std::string& spriteAnimFilename, const Point& posit
     : Entity(position, direction)
     , m_spriteAnimInstance(spriteAnimFilename)
 {
-    m_spriteAnimInstance.play("idle_front");
+    setDirection(Front);
+    m_spriteAnimInstance.play("idle");
     m_dice.resize(2);
 }
 
@@ -60,6 +61,17 @@ void Charactere::moveTo(const Point& position, const MoveCallback& callback)
             callback();
         });
     });
+}
+
+void Charactere::sleep()
+{
+    setDirection(Front);
+    m_spriteAnimInstance.play("idle");
+}
+
+void Charactere::wakeUp()
+{
+    m_spriteAnimInstance.play("idle_front");
 }
 
 void Charactere::render()

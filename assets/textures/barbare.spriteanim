@@ -1,4 +1,7 @@
 <sheet texture="barbare.png" spriteWidth="16" spriteHeight="32" originX="0" originY="18">
+  <anim name="idle" fps="1" loop="true">
+    <frame id="0"/>
+  </anim>
   <anim name="idle_front" fps="5" loop="true">
     <frame id="0" repeat="2"/>
     <frame id="1" repeat="1"/>

@@ -19,6 +19,8 @@ public:
 
     void moveTo(const Point& position, const MoveCallback& callback);
     Dice getDice() const;
+    void sleep();
+    void wakeUp();
 
 protected:
     OSpriteAnimInstance m_spriteAnimInstance;
