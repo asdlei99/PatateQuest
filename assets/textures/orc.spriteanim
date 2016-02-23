@@ -1,0 +1,29 @@
+<sheet texture="orc.png" spriteWidth="16" spriteHeight="16" originX="0" originY="0">
+  <anim name="idle" fps="1" loop="true">
+    <frame id="0"/>
+  </anim>
+  <anim name="idle_front" fps="5" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="run_front" fps="12" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="idle_left" fps="5" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="run_left" fps="12" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="idle_back" fps="5" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="run_back" fps="12" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="idle_right" fps="5" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+  <anim name="run_right" fps="12" loop="true">
+    <frame id="0" repeat="2"/>
+  </anim>
+</sheet>

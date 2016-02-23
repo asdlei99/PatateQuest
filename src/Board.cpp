@@ -9,12 +9,14 @@
 #include "EtabliDAlchimiste.h"
 #include "LargeEboulis.h"
 #include "Oubliette.h"
+#include "Orc.h"
 #include "PorteFermee.h"
 #include "PorteOuverte.h"
 #include "PorteSecrete.h"
 #include "PupitreDeSorcier.h"
 #include "RatelierDArmes.h"
 #include "Room.h"
+#include "Squelette.h"
 #include "Stairs.h"
 #include "Table.h"
 #include "Tombe.h"
@@ -119,6 +121,23 @@ Board::Board(int questId)
     m_entities.push_back(OMake<PorteFermee>(Point{29, 3}, Entity::Direction::Front));
     m_entities.push_back(OMake<PorteFermee>(Point{30, 3}, Entity::Direction::Front));
 
+    // Monsters
+    m_entities.push_back(OMake<Orc>(Point{27, 5}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{28, 5}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{29, 5}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{30, 5}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{27, 6}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{28, 6}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{29, 6}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{30, 6}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Orc>(Point{27, 7}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Squelette>(Point{27, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{28, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{29, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{30, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{27, 9}, Entity::Direction::Front));
+
     // Create rooms. NEVER CHANGE ORDER
     m_rooms = {
         // Top left quadrant
@@ -180,6 +199,11 @@ Board::Board(int questId)
         }
         for (auto& pEntity : m_entities)
         {
+            auto pMonster = ODynamicCast<Monster>(pEntity);
+            if (pMonster)
+            {
+                m_monsters.push_back(pMonster);
+            }
             if (ODynamicCast<Stairs>(pEntity) ||
                 ODynamicCast<Charactere>(pEntity) ||
                 ODynamicCast<PorteFermee>(pEntity) ||
@@ -330,6 +354,12 @@ bool Board::isMovableToIgnoreCharacters(const Point& at, const Point& to) const
             at.y >= pStairs->getPosition().y &&
             at.x < pStairs->getPosition().x + pStairs->getSize().x &&
             at.y < pStairs->getPosition().y + pStairs->getSize().y) return false;
+    }
+
+    auto pMonster = getEntityAt<Monster>(at);
+    if (pMonster)
+    {
+        return false;
     }
 
     // Check that we are not in a different room

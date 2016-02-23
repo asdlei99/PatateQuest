@@ -72,6 +72,15 @@
     <ClCompile Include="..\..\src\Trone.cpp">
       <Filter>entities\mobilier</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Monster.cpp">
+      <Filter>entities\characteres</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Orc.cpp">
+      <Filter>entities\characteres</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Squelette.cpp">
+      <Filter>entities\characteres</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Board.h" />
@@ -143,6 +152,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Trone.h">
       <Filter>entities\mobilier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Monster.h">
+      <Filter>entities\characteres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Orc.h">
+      <Filter>entities\characteres</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Squelette.h">
+      <Filter>entities\characteres</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

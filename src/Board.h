@@ -17,6 +17,7 @@ OForwardDeclare(Texture);
 ForwardDeclare(Board);
 ForwardDeclare(Charactere);
 ForwardDeclare(Entity);
+ForwardDeclare(Monster);
 ForwardDeclare(Porte);
 ForwardDeclare(PorteFermee);
 ForwardDeclare(Room);
@@ -82,6 +83,7 @@ private:
     using Rooms = std::vector<RoomRef>;
     using Heroes = std::vector<CharactereRef>;
     using Tiles = std::vector<Point>;
+    using Monsters = std::vector<MonsterRef>;
 
     enum class State
     {
@@ -165,6 +167,7 @@ private:
 
     Entities m_entities;
     Rooms m_rooms;
+    Monsters m_monsters;
 
     EntityRef m_pDraggingEntity;
     Point m_mousePosOnDown;

@@ -35,6 +35,6 @@ protected:
     int m_attaque = 0;
     int m_defense = 0;
     int m_corp = 1;
-    int m_esprit = 0;
+    int m_esprit = 1;
     int m_deplacement = 1;
 };

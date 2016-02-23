@@ -98,6 +98,8 @@
     <ClCompile Include="..\..\src\Game.cpp" />
     <ClCompile Include="..\..\src\LargeEboulis.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\Monster.cpp" />
+    <ClCompile Include="..\..\src\Orc.cpp" />
     <ClCompile Include="..\..\src\Oubliette.cpp" />
     <ClCompile Include="..\..\src\Porte.cpp" />
     <ClCompile Include="..\..\src\PorteFermee.cpp" />
@@ -106,6 +108,7 @@
     <ClCompile Include="..\..\src\PupitreDeSorcier.cpp" />
     <ClCompile Include="..\..\src\RatelierDArmes.cpp" />
     <ClCompile Include="..\..\src\Room.cpp" />
+    <ClCompile Include="..\..\src\Squelette.cpp" />
     <ClCompile Include="..\..\src\Stairs.cpp" />
     <ClCompile Include="..\..\src\Table.cpp" />
     <ClCompile Include="..\..\src\Tombe.cpp" />
@@ -131,6 +134,8 @@
     <ClInclude Include="..\..\src\EtabliDAlchimiste.h" />
     <ClInclude Include="..\..\src\Game.h" />
     <ClInclude Include="..\..\src\LargeEboulis.h" />
+    <ClInclude Include="..\..\src\Monster.h" />
+    <ClInclude Include="..\..\src\Orc.h" />
     <ClInclude Include="..\..\src\Oubliette.h" />
     <ClInclude Include="..\..\src\Porte.h" />
     <ClInclude Include="..\..\src\PorteFermee.h" />
@@ -139,6 +144,7 @@
     <ClInclude Include="..\..\src\PupitreDeSorcier.h" />
     <ClInclude Include="..\..\src\RatelierDArmes.h" />
     <ClInclude Include="..\..\src\Room.h" />
+    <ClInclude Include="..\..\src\Squelette.h" />
     <ClInclude Include="..\..\src\Stairs.h" />
     <ClInclude Include="..\..\src\Table.h" />
     <ClInclude Include="..\..\src\Tombe.h" />
