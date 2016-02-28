@@ -9,9 +9,6 @@
     <ClCompile Include="..\..\src\Room.cpp" />
     <ClCompile Include="..\..\src\Die.cpp" />
     <ClCompile Include="..\..\src\Game.cpp" />
-    <ClCompile Include="..\..\src\Barbare.cpp">
-      <Filter>entities\characteres</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Bibliotheque.cpp">
       <Filter>entities\mobilier</Filter>
     </ClCompile>
@@ -72,14 +69,48 @@
     <ClCompile Include="..\..\src\Trone.cpp">
       <Filter>entities\mobilier</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Board_.cpp" />
+    <ClCompile Include="..\..\src\Barbare.cpp">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Hero.cpp">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\Monster.cpp">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Orc.cpp">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Squelette.cpp">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Momie.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Gargouille.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Zombi.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Lutin.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GuerrierDuChaos.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Fimir.cpp">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Elfe.cpp">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nain.cpp">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Enchanteur.cpp">
+      <Filter>entities\characteres\heroes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,9 +121,6 @@
     <ClInclude Include="..\..\src\Room.h" />
     <ClInclude Include="..\..\src\Die.h" />
     <ClInclude Include="..\..\src\Game.h" />
-    <ClInclude Include="..\..\src\Barbare.h">
-      <Filter>entities\characteres</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Bibliotheque.h">
       <Filter>entities\mobilier</Filter>
     </ClInclude>
@@ -153,14 +181,48 @@
     <ClInclude Include="..\..\src\Trone.h">
       <Filter>entities\mobilier</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Board_.h" />
+    <ClInclude Include="..\..\src\Barbare.h">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Hero.h">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\Monster.h">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Orc.h">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Squelette.h">
-      <Filter>entities\characteres</Filter>
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Momie.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Gargouille.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Zombi.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Lutin.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GuerrierDuChaos.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Fimir.h">
+      <Filter>entities\characteres\monsters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Elfe.h">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nain.h">
+      <Filter>entities\characteres\heroes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Enchanteur.h">
+      <Filter>entities\characteres\heroes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +237,12 @@
     </Filter>
     <Filter Include="entities\tuiles">
       <UniqueIdentifier>{7e8fec6b-cc7f-4c95-92f5-25ba39314260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entities\characteres\monsters">
+      <UniqueIdentifier>{b1da88cc-9125-4b00-aa4c-ac3451f83ffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entities\characteres\heroes">
+      <UniqueIdentifier>{54ce8c24-152f-41af-b73b-b97237ad5307}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

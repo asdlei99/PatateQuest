@@ -1,4 +1,4 @@
-<sheet texture="barbare.png" spriteWidth="16" spriteHeight="32" originX="0" originY="18">
+<sheet texture="elfe.png" spriteWidth="16" spriteHeight="32" originX="0" originY="18">
   <anim name="idle" fps="1" loop="true">
     <frame id="0"/>
   </anim>

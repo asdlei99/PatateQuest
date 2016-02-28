@@ -1,17 +1,17 @@
-#include "Barbare.h"
 #include "Board.h"
+#include "Nain.h"
 
 #include "onut/SpriteAnim.h"
 #include "onut/Texture.h"
 
 #include "onut_old.h"
 
-Barbare::Barbare(const Point& position, Direction direction)
+Nain::Nain(const Point& position, Direction direction)
     : Hero("barbare.spriteanim", position, direction)
 {
-    m_attaque = 3;
+    m_attaque = 2;
     m_defense = 2;
     m_deplacement = 2;
-    m_esprit = 2;
-    m_corp = 8;
+    m_esprit = 4;
+    m_corp = 6;
 }

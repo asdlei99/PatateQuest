@@ -1,10 +1,12 @@
 #pragma once
 #include "Die.h"
 
-#include "onut/Maths.h"
-#include "onut/Point.h"
+#include <onut/Maths.h>
+#include <onut/Point.h>
 
 #include "TimingUtils.h"
+
+#include <micropather/micropather.h>
 
 #include <condition_variable>
 #include <thread>
@@ -22,7 +24,9 @@ ForwardDeclare(Porte);
 ForwardDeclare(PorteFermee);
 ForwardDeclare(Room);
 
-class Board
+using MicroPatherRef = std::shared_ptr<micropather::MicroPather>;
+
+class Board final : public micropather::Graph
 {
 public:
     static const int TILE_SIZE = 16;
@@ -70,18 +74,48 @@ public:
         return nullptr;
     }
     bool isMovableToIgnoreCharacters(const Point& at, const Point& to) const;
+    bool isMovableToIgnoreHeroes(const Point& at, const Point& to) const;
+    bool isMovableTo(const Point& at, const Point& to) const;
     bool isPassableAt(const Point& at) const;
     bool areMonstersVisible(const Point& at) const;
     bool isVisibleAt(const Point& at);
     bool lineOfSight(Point from, Point to);
+    void attack(const CharactereRef& attacker, const CharactereRef& target);
 
     void save();
     void load();
 
+protected:
+    /**
+    Return the least possible cost between 2 states. For example, if your pathfinding
+    is based on distance, this is simply the straight distance between 2 points on the
+    map. If you pathfinding is based on minimum time, it is the minimal travel time
+    between 2 points given the best possible terrain.
+    */
+    float LeastCostEstimate(void* stateStart, void* stateEnd) override;
+
+    /**
+    Return the exact cost from the given state to all its neighboring states. This
+    may be called multiple times, or cached by the solver. It *must* return the same
+    exact values for every call to MicroPather::Solve(). It should generally be a simple,
+    fast function with no callbacks into the pather.
+    */
+    void AdjacentCost(void* state, MP_VECTOR< micropather::StateCost > *adjacent) override;
+
+    /**
+    This function is only used in DEBUG mode - it dumps output to stdout. Since void*
+    aren't really human readable, normally you print out some concise info (like "(1,2)")
+    without an ending newline.
+    */
+    void  PrintStateInfo(void* state) override;
+
+    Point stateToTile(void* state) const;
+    void* tileToState(const Point& tile) const;
+
 private:
     using Entities = std::vector<EntityRef>;
     using Rooms = std::vector<RoomRef>;
-    using Heroes = std::vector<CharactereRef>;
+    using Characteres = std::vector<CharactereRef>;
     using Tiles = std::vector<Point>;
     using Monsters = std::vector<MonsterRef>;
 
@@ -90,7 +124,8 @@ private:
         Idle,
         LancerDes,
         Mouvement,
-        Walking
+        Walking,
+        Attacking
     } m_state = State::Idle;
 
     using Path = std::vector<Point>;
@@ -100,6 +135,7 @@ private:
         void next();
 
         bool hasMoved = false;
+        bool hasProgressMoved = false;
         bool hasDoneAction = false;
         int whosTurn = -1;
         Dice dice;
@@ -134,6 +170,7 @@ private:
     static const ContextMenu::Option FINIR_TOUR;
     static const ContextMenu::Option OUVRIR_PORTE;
     static const ContextMenu::Option IGNORER;
+    static const ContextMenu::Option ATTAQUER;
 
     void updateTransforms();
     void nextTurn();
@@ -145,10 +182,11 @@ private:
     PorteRef getDoorAt(const Point& from, const Point& to);
     void showContextMenu(const ContextMenu::Options& options);
     void openDoor(const PorteFermeeRef& porte);
-    void updateFogOfWar();
+    void updateFogOfWar(const CharactereRef& pHero);
     void makeRoomVisible(const RoomRef& pRoom);
     bool isObstructedAt(const Point& pos);
     void drawDice();
+    void aiMove(const MonsterRef& pMonster);
 
     bool m_editorMode = false;
     int m_questId = 1;
@@ -159,7 +197,8 @@ private:
     OFontRef m_pFont;
     bool m_visibility[BOARD_WIDTH][BOARD_HEIGHT];
     bool m_passable[BOARD_WIDTH][BOARD_HEIGHT];
-    Heroes m_heroes;
+    Characteres m_heroes;
+    Characteres m_characteres;
     Tiles m_hallwayTiles;
 
     Pointer m_selection;
@@ -177,5 +216,13 @@ private:
     Matrix m_transformScale;
     Point m_mousePosOnBoard;
 
-    OTimer m_actionTimer;
+    struct Action
+    {
+        OTimer timer;
+        std::string text;
+        Point pos;
+        float yOffset = 0;
+    } m_action;
+
+    MicroPatherRef m_pPather;
 };

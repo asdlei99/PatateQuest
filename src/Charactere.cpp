@@ -109,3 +109,52 @@ int Charactere::getDeplacement() const
 {
     return m_deplacement;
 }
+
+int Charactere::rollAttaque() const
+{
+    int damage = 0;
+    for (int i = 0; i < getAttaque(); ++i)
+    {
+        switch (ORandInt(1, 6))
+        {
+            case 1:
+            case 2:
+            case 3:
+                damage++;
+                break;
+            case 4:
+            case 5:
+            case 6:
+                break;
+        }
+    }
+    return damage;
+}
+
+int Charactere::rollDefense() const
+{
+    int defense = 0;
+    for (int i = 0; i < getDefense(); ++i)
+    {
+        switch (ORandInt(1, 6))
+        {
+            case 1:
+            case 2:
+            case 3:
+                break;
+            case 4:
+            case 5:
+                defense++;
+                break;
+            case 6:
+                break;
+        }
+    }
+    return defense;
+}
+
+int Charactere::damage(int value)
+{
+    m_corp = std::max(0, m_corp - value);
+    return m_corp;
+}

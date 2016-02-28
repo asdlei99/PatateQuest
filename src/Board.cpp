@@ -6,8 +6,16 @@
 #include "Chevalet.h"
 #include "Coffre.h"
 #include "Eboulis.h"
+#include "Elfe.h"
+#include "Enchanteur.h"
 #include "EtabliDAlchimiste.h"
+#include "Fimir.h"
+#include "Gargouille.h"
+#include "GuerrierDuChaos.h"
 #include "LargeEboulis.h"
+#include "Lutin.h"
+#include "Nain.h"
+#include "Momie.h"
 #include "Oubliette.h"
 #include "Orc.h"
 #include "PorteFermee.h"
@@ -21,11 +29,13 @@
 #include "Table.h"
 #include "Tombe.h"
 #include "Trone.h"
+#include "Zombi.h"
 
-#include "onut/Font.h"
-#include "onut/Input.h"
-#include "onut/SpriteAnim.h"
-#include "onut/Texture.h"
+#include <onut/Font.h>
+#include <onut/Input.h>
+#include <onut/Log.h>
+#include <onut/SpriteAnim.h>
+#include <onut/Texture.h>
 
 #include "onut_old.h"
 
@@ -39,18 +49,23 @@ const Board::ContextMenu::Option Board::FINIR_TOUR = "FINIR TOUR";
 const Board::ContextMenu::Option Board::MOUVEMENT_TERMINE = "MOUVEMENT TERMINÉ";
 const Board::ContextMenu::Option Board::OUVRIR_PORTE = "OUVRIR PORTE";
 const Board::ContextMenu::Option Board::IGNORER = "IGNORER";
+const Board::ContextMenu::Option Board::ATTAQUER = "ATTAQUER";
 
 void Board::PlayerTurn::next()
 {
     whosTurn++;
     hasMoved = false;
     hasDoneAction = false;
+    hasProgressMoved = false;
 }
 
 Board::Board(int questId)
     : m_questId(questId)
 {
     oGenerateMipmaps = false;
+
+    // Path finder
+    m_pPather = OMake<micropather::MicroPather>(this, BOARD_WIDTH * BOARD_HEIGHT, 4, true);
 
     // Resources
     m_pBoardTexture = OGetTexture("board.png");
@@ -132,11 +147,41 @@ Board::Board(int questId)
     m_entities.push_back(OMake<Orc>(Point{30, 6}, Entity::Direction::Front));
     m_entities.push_back(OMake<Orc>(Point{27, 7}, Entity::Direction::Front));
 
-    m_entities.push_back(OMake<Squelette>(Point{27, 8}, Entity::Direction::Front));
-    m_entities.push_back(OMake<Squelette>(Point{28, 8}, Entity::Direction::Front));
-    m_entities.push_back(OMake<Squelette>(Point{29, 8}, Entity::Direction::Front));
-    m_entities.push_back(OMake<Squelette>(Point{30, 8}, Entity::Direction::Front));
-    m_entities.push_back(OMake<Squelette>(Point{27, 9}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{27, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{28, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{29, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{30, 8}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{27, 9}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{28, 9}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Lutin>(Point{29, 9}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Fimir>(Point{27, 10}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Fimir>(Point{28, 10}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Fimir>(Point{29, 10}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Fimir>(Point{30, 10}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<GuerrierDuChaos>(Point{27, 11}, Entity::Direction::Front));
+    m_entities.push_back(OMake<GuerrierDuChaos>(Point{28, 11}, Entity::Direction::Front));
+    m_entities.push_back(OMake<GuerrierDuChaos>(Point{29, 11}, Entity::Direction::Front));
+    m_entities.push_back(OMake<GuerrierDuChaos>(Point{30, 11}, Entity::Direction::Front));
+    m_entities.push_back(OMake<GuerrierDuChaos>(Point{27, 12}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Gargouille>(Point{27, 13}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Gargouille>(Point{28, 13}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Squelette>(Point{27, 14}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{28, 14}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{29, 14}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{30, 14}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Squelette>(Point{27, 15}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Zombi>(Point{27, 16}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Zombi>(Point{28, 16}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Zombi>(Point{29, 16}, Entity::Direction::Front));
+
+    m_entities.push_back(OMake<Momie>(Point{27, 17}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Momie>(Point{28, 17}, Entity::Direction::Front));
+    m_entities.push_back(OMake<Momie>(Point{29, 17}, Entity::Direction::Front));
 
     // Create rooms. NEVER CHANGE ORDER
     m_rooms = {
@@ -221,13 +266,15 @@ Board::Board(int questId)
         // Spawn heroes
         auto pStairs = getEntity<Stairs>();
         m_heroes.push_back(OMake<Barbare>(pStairs->getPosition() + Point(1, 1), pStairs->getDirection()));
-        //m_heroes.push_back(OMake<Barbare>(pStairs->getPosition() + Point(1, 0), pStairs->getDirection()));
-        //m_heroes.push_back(OMake<Barbare>(pStairs->getPosition() + Point(0, 1), pStairs->getDirection()));
-        //m_heroes.push_back(OMake<Barbare>(pStairs->getPosition() + Point(0, 0), pStairs->getDirection()));
+        m_heroes.push_back(OMake<Elfe>(pStairs->getPosition() + Point(0, 1), pStairs->getDirection()));
+        m_heroes.push_back(OMake<Enchanteur>(pStairs->getPosition() + Point(1, 0), pStairs->getDirection()));
+        m_heroes.push_back(OMake<Nain>(pStairs->getPosition() + Point(0, 0), pStairs->getDirection()));
         for (auto& pHero : m_heroes)
         {
             m_entities.push_back(pHero);
+            m_characteres.push_back(pHero);
         }
+        OShuffle(m_characteres);
         makeRoomVisible(getRoomAt(pStairs->getPosition()));
 
         m_playerTurn.dice.push_back(Die());
@@ -241,7 +288,7 @@ void Board::nextTurn()
 {
     if (m_playerTurn.whosTurn != JOUEUR_SORCIER)
     {
-        auto pHero = m_heroes[m_playerTurn.whosTurn];
+        auto pHero = m_characteres[m_playerTurn.whosTurn];
         if (pHero)
         {
             pHero->sleep();
@@ -251,7 +298,7 @@ void Board::nextTurn()
     m_playerTurn.next();
     m_fleche.pos = {-20, -20};
     m_playerTurn.walkedTiles.clear();
-    if (m_playerTurn.whosTurn >= static_cast<int>(m_heroes.size()))
+    if (m_playerTurn.whosTurn >= static_cast<int>(m_characteres.size()))
     {
         m_playerTurn.whosTurn = 0;// JOUEUR_SORCIER;
     }
@@ -261,7 +308,7 @@ void Board::nextTurn()
     }
     else
     {
-        auto pHero = m_heroes[m_playerTurn.whosTurn];
+        auto pHero = m_characteres[m_playerTurn.whosTurn];
         if (pHero)
         {
             pHero->wakeUp();
@@ -269,6 +316,7 @@ void Board::nextTurn()
             m_selection.pos = pHero->getPosition();
         }
     }
+    m_pPather->Reset();
 }
 
 const Matrix& Board::getTransform() const
@@ -356,12 +404,6 @@ bool Board::isMovableToIgnoreCharacters(const Point& at, const Point& to) const
             at.y < pStairs->getPosition().y + pStairs->getSize().y) return false;
     }
 
-    auto pMonster = getEntityAt<Monster>(at);
-    if (pMonster)
-    {
-        return false;
-    }
-
     // Check that we are not in a different room
     auto pAtRoom = getRoomAt(at);
     auto pToRoom = getRoomAt(to);
@@ -384,6 +426,74 @@ bool Board::isMovableToIgnoreCharacters(const Point& at, const Point& to) const
     return true;
 }
 
+bool Board::isMovableToIgnoreHeroes(const Point& at, const Point& to) const
+{
+    if (!isPassableAt(at)) return false;
+
+    // Is it adjacent?
+    if (!(at.x == to.x - 1 && at.y == to.y) &&
+        !(at.x == to.x + 1 && at.y == to.y) &&
+        !(at.x == to.x && at.y == to.y - 1) &&
+        !(at.x == to.x && at.y == to.y + 1)) return false;
+
+    if (getEntityAt<Monster>(at)) return false;
+
+    // Check that we are not in a different room
+    auto pAtRoom = getRoomAt(at);
+    auto pToRoom = getRoomAt(to);
+    if (pAtRoom != pToRoom)
+    {
+        // Check for doors between the 2
+        auto doorPos = at;
+        if (at.x < to.x || at.y < to.y)
+        {
+            doorPos = to;
+        }
+        auto pDoor = getEntityAt<PorteOuverte>(doorPos);
+        if (pDoor)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    return true;
+}
+
+bool Board::isMovableTo(const Point& at, const Point& to) const
+{
+    if (!isPassableAt(at)) return false;
+
+    // Is it adjacent?
+    if (!(at.x == to.x - 1 && at.y == to.y) &&
+        !(at.x == to.x + 1 && at.y == to.y) &&
+        !(at.x == to.x && at.y == to.y - 1) &&
+        !(at.x == to.x && at.y == to.y + 1)) return false;
+
+    if (getEntityAt<Charactere>(at)) return false;
+
+    // Check that we are not in a different room
+    auto pAtRoom = getRoomAt(at);
+    auto pToRoom = getRoomAt(to);
+    if (pAtRoom != pToRoom)
+    {
+        // Check for doors between the 2
+        auto doorPos = at;
+        if (at.x < to.x || at.y < to.y)
+        {
+            doorPos = to;
+        }
+        auto pDoor = getEntityAt<PorteOuverte>(doorPos);
+        if (pDoor)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    return true;
+}
+
 void Board::doContextMenuAction(const ContextMenu::Option& option)
 {
     if (m_state == State::Mouvement)
@@ -394,7 +504,7 @@ void Board::doContextMenuAction(const ContextMenu::Option& option)
     {
         m_state = State::LancerDes;
         m_playerTurn.dicePos = Point(0, -3);
-        m_actionTimer.start(0.6f, [this]
+        m_action.timer.start(0.6f, [this]
         {
             m_state = State::Mouvement;
             m_playerTurn.dice.randomize();
@@ -418,6 +528,76 @@ void Board::doContextMenuAction(const ContextMenu::Option& option)
         auto pPorteFermee = reinterpret_cast<PorteFermee*>(m_contextMenu.userData)->shared_from_this();
         openDoor(pPorteFermee);
     }
+    else if (option == ATTAQUER)
+    {
+        auto pMonster = reinterpret_cast<Monster*>(m_contextMenu.userData)->shared_from_this();
+        auto pHero = m_characteres[m_playerTurn.whosTurn];
+        if (pMonster && pHero)
+        {
+            attack(pHero, pMonster);
+        }
+    }
+}
+
+void Board::attack(const CharactereRef& attacker, const CharactereRef& target)
+{
+    m_playerTurn.hasDoneAction = true;
+    auto damage = attacker->rollAttaque();
+    auto defense = target->rollDefense();
+    auto realDamage = std::max(0, damage - defense);
+    m_state = State::Attacking;
+    if (defense >= damage)
+    {
+        m_action.text = "BLOQUÉ";
+    }
+    else if (damage == 0)
+    {
+        m_action.text = "MANQUÉ";
+    }
+    else
+    {
+        m_action.text = std::to_string(-realDamage);
+    }
+    m_action.pos = target->getPosition();
+    m_action.pos.y--;
+    m_action.yOffset = 0.f;
+    m_action.timer.start(1.5f, [this, realDamage, target]
+    {
+        m_state = State::Idle;
+        if (!target->damage(realDamage))
+        {
+            // Dead
+            target->setPosition({-20, -20});
+            int index = 0;
+            for (auto it = m_characteres.begin(); it != m_characteres.end(); ++it)
+            {
+                auto& pCharactere = *it;
+                if (pCharactere == target)
+                {
+                    if (m_playerTurn.whosTurn > index)
+                    {
+                        --m_playerTurn.whosTurn;
+                    }
+                    m_characteres.erase(it);
+                    break;
+                }
+                ++index;
+            }
+            for (auto it = m_heroes.begin(); it != m_heroes.end(); ++it)
+            {
+                auto& pCharactere = *it;
+                if (pCharactere == target)
+                {
+                    m_heroes.erase(it);
+                    break;
+                }
+            }
+        }
+        if (m_playerTurn.hasMoved)
+        {
+            doContextMenuAction(FINIR_TOUR);
+        }
+    });
 }
 
 void Board::openDoor(const PorteFermeeRef& porte)
@@ -444,7 +624,7 @@ void Board::openDoor(const PorteFermeeRef& porte)
     }
 
     // Update visibility
-    updateFogOfWar();
+    for (auto& pHero : m_heroes) updateFogOfWar(pHero);
 }
 
 bool Board::hasClosedDoor(const Point& from, const Point& to)
@@ -567,7 +747,68 @@ void Board::update()
                 m_fleche.pos = {-20, -20};
             }
         }
-        else if (m_playerTurn.whosTurn != JOUEUR_SORCIER)
+        switch (m_state)
+        {
+            case State::Attacking:
+                m_action.yOffset += ODT;
+                break;
+        }
+        auto pMonster = ODynamicCast<Monster>(m_characteres[m_playerTurn.whosTurn]);
+        if (pMonster)
+        {
+            switch (m_state)
+            {
+                case State::Idle:
+                {
+                    // Hero beside us? Attack!
+                    Characteres proximityHeroes;
+                    if (!m_playerTurn.hasDoneAction)
+                    {
+                        auto pHero = getEntityAt<Hero>(pMonster->getPosition() + Point(1, 0));
+                        if (pHero && isMovableToIgnoreCharacters(pMonster->getPosition() + Point(1, 0), pMonster->getPosition()))
+                        {
+                            proximityHeroes.push_back(pHero);
+                        }
+                        pHero = getEntityAt<Hero>(pMonster->getPosition() + Point(-1, 0));
+                        if (pHero && isMovableToIgnoreCharacters(pMonster->getPosition() + Point(-1, 0), pMonster->getPosition()))
+                        {
+                            proximityHeroes.push_back(pHero);
+                        }
+                        pHero = getEntityAt<Hero>(pMonster->getPosition() + Point(0, 1));
+                        if (pHero && isMovableToIgnoreCharacters(pMonster->getPosition() + Point(0, 1), pMonster->getPosition()))
+                        {
+                            proximityHeroes.push_back(pHero);
+                        }
+                        pHero = getEntityAt<Hero>(pMonster->getPosition() + Point(0, -1));
+                        if (pHero && isMovableToIgnoreCharacters(pMonster->getPosition() + Point(0, -1), pMonster->getPosition()))
+                        {
+                            proximityHeroes.push_back(pHero);
+                        }
+                    }
+
+                    if (!proximityHeroes.empty())
+                    {
+                        if (m_playerTurn.hasProgressMoved)
+                        {
+                            m_playerTurn.hasMoved = true;
+                        }
+                        auto pTarget = ORandVector(proximityHeroes);
+                        attack(pMonster, pTarget);
+                    }
+                    else if (!m_playerTurn.hasMoved)
+                    {
+                        // No? Move to closest hero
+                        aiMove(pMonster);
+                    }
+                    else
+                    {
+                        nextTurn();
+                    }
+                    break;
+                }
+            }
+        }
+        else
         {
             switch (m_state)
             {
@@ -575,7 +816,7 @@ void Board::update()
                 {
                     if (OInputJustPressed(OMouse1))
                     {
-                        auto pHero = m_heroes[m_playerTurn.whosTurn];
+                        auto pHero = m_characteres[m_playerTurn.whosTurn];
                         if (pHero)
                         {
                             if (isMovableToIgnoreCharacters(getMouseOnBoard(), pHero->getPosition()))
@@ -584,10 +825,19 @@ void Board::update()
                                 if (hasClosedDoor(pHero->getPosition(), getMouseOnBoard()))
                                 {
                                     showContextMenu({OUVRIR_PORTE});
-                                    m_contextMenu.pos.x += 2;
                                     auto pPorte = getDoorAt(pHero->getPosition(), getMouseOnBoard());
                                     m_contextMenu.userData = reinterpret_cast<uintptr_t>(pPorte.get());
                                     break;
+                                }
+                                else if (!m_playerTurn.hasDoneAction)
+                                {
+                                    auto pMonster = getEntityAt<Monster>(getMouseOnBoard());
+                                    if (pMonster)
+                                    {
+                                        showContextMenu({ATTAQUER});
+                                        m_contextMenu.userData = reinterpret_cast<uintptr_t>(pMonster.get());
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -595,7 +845,7 @@ void Board::update()
                     else if (OInputJustPressed(OMouse2))
                     {
                         // Did we click beside the hero? Ask to roll dice
-                        auto pHero = m_heroes[m_playerTurn.whosTurn];
+                        auto pHero = m_characteres[m_playerTurn.whosTurn];
                         if (pHero)
                         {
                             ContextMenu::Options options{FINIR_TOUR};
@@ -624,7 +874,7 @@ void Board::update()
                 {
                     if (OInputJustPressed(OMouse1))
                     {
-                        auto pHero = m_heroes[m_playerTurn.whosTurn];
+                        auto pHero = m_characteres[m_playerTurn.whosTurn];
                         if (pHero)
                         {
                             if (isMovableToIgnoreCharacters(getMouseOnBoard(), pHero->getPosition()))
@@ -633,10 +883,19 @@ void Board::update()
                                 if (hasClosedDoor(pHero->getPosition(), getMouseOnBoard()))
                                 {
                                     showContextMenu({OUVRIR_PORTE});
-                                    m_contextMenu.pos.x += 2;
                                     auto pPorte = getDoorAt(pHero->getPosition(), getMouseOnBoard());
                                     m_contextMenu.userData = reinterpret_cast<uintptr_t>(pPorte.get());
                                     break;
+                                }
+                                else if (!m_playerTurn.hasDoneAction)
+                                {
+                                    auto pMonster = getEntityAt<Monster>(getMouseOnBoard());
+                                    if (pMonster)
+                                    {
+                                        showContextMenu({ATTAQUER});
+                                        m_contextMenu.userData = reinterpret_cast<uintptr_t>(pMonster.get());
+                                        break;
+                                    }
                                 }
 
                                 if (m_playerTurn.walkedTiles.empty()) m_playerTurn.walkedTiles.push_back(pHero->getPosition());
@@ -651,7 +910,7 @@ void Board::update()
                                 }
                                 auto moveTo = getMouseOnBoard();
                                 m_state = State::Walking;
-                                pHero->moveTo(moveTo, [this, moveTo]
+                                pHero->moveTo(moveTo, [this, moveTo, pHero]
                                 {
                                     m_state = State::Mouvement;
                                     m_playerTurn.walkedTiles.push_back(moveTo);
@@ -661,14 +920,14 @@ void Board::update()
                                         m_state = State::Idle;
                                         m_fleche.pos = {-20, -20};
                                     }
-                                    updateFogOfWar();
+                                    updateFogOfWar(pHero);
                                 });
                             }
                         }
                     }
                     else if (OInputJustPressed(OMouse2))
                     {
-                        auto pHero = m_heroes[m_playerTurn.whosTurn];
+                        auto pHero = m_characteres[m_playerTurn.whosTurn];
                         if (pHero)
                         {
                             ContextMenu::Options options({FINIR_TOUR});
@@ -899,7 +1158,6 @@ void Board::render()
         // Show contextual menu
         if (m_contextMenu.visible)
         {
-            //const OTextureRef& pTexture, const Rect& rect, const Vector4& padding, const Color& color
             Point pos = m_contextMenu.pos;
             pos.y -= static_cast<int>(m_contextMenu.options.size());
             pos.y++;
@@ -977,7 +1235,7 @@ void Board::render()
             case State::Mouvement:
             {
                 drawDice();
-                auto pHero = m_heroes[m_playerTurn.whosTurn];
+                auto pHero = m_characteres[m_playerTurn.whosTurn];
                 if (pHero)
                 {
                     if (isMovableToIgnoreCharacters(pHero->getPosition() + Point(1, 0), pHero->getPosition()))
@@ -1001,26 +1259,47 @@ void Board::render()
             }
             case State::Idle:
             {
-                auto pHero = m_heroes[m_playerTurn.whosTurn];
+                auto pHero = m_characteres[m_playerTurn.whosTurn];
                 if (pHero)
                 {
-                    if (hasClosedDoor(pHero->getPosition() + Point(1, 0), pHero->getPosition()))
+                    if (hasClosedDoor(pHero->getPosition() + Point(1, 0), pHero->getPosition()) ||
+                        (getEntityAt<Monster>(pHero->getPosition() + Point(1, 0)) && !m_playerTurn.hasDoneAction &&
+                        isMovableToIgnoreCharacters(pHero->getPosition() + Point(1, 0), pHero->getPosition())))
                     {
                         drawArrowAt(pHero->getPosition() + Point(1, 0));
                     }
-                    if (hasClosedDoor(pHero->getPosition() + Point(-1, 0), pHero->getPosition()))
+                    if (hasClosedDoor(pHero->getPosition() + Point(-1, 0), pHero->getPosition()) ||
+                        (getEntityAt<Monster>(pHero->getPosition() + Point(-1, 0)) && !m_playerTurn.hasDoneAction &&
+                        isMovableToIgnoreCharacters(pHero->getPosition() + Point(-1, 0), pHero->getPosition())))
                     {
                         drawArrowAt(pHero->getPosition() + Point(-1, 0));
                     }
-                    if (hasClosedDoor(pHero->getPosition() + Point(0, 1), pHero->getPosition()))
+                    if (hasClosedDoor(pHero->getPosition() + Point(0, 1), pHero->getPosition()) ||
+                        (getEntityAt<Monster>(pHero->getPosition() + Point(0, 1)) && !m_playerTurn.hasDoneAction &&
+                        isMovableToIgnoreCharacters(pHero->getPosition() + Point(0, 1), pHero->getPosition())))
                     {
                         drawArrowAt(pHero->getPosition() + Point(0, 1));
                     }
-                    if (hasClosedDoor(pHero->getPosition() + Point(0, -1), pHero->getPosition()))
+                    if (hasClosedDoor(pHero->getPosition() + Point(0, -1), pHero->getPosition()) ||
+                        (getEntityAt<Monster>(pHero->getPosition() + Point(0, -1)) && !m_playerTurn.hasDoneAction &&
+                        isMovableToIgnoreCharacters(pHero->getPosition() + Point(0, -1), pHero->getPosition())))
                     {
                         drawArrowAt(pHero->getPosition() + Point(0, -1));
                     }
                 }
+                break;
+            }
+        }
+        switch (m_state)
+        {
+            case State::Attacking:
+            {
+                Vector2 textPos;
+                textPos.x = static_cast<float>(m_action.pos.x * TILE_SIZE + TILE_SIZE / 2);
+                textPos.y = static_cast<float>(m_action.pos.y * TILE_SIZE + TILE_SIZE / 2 - static_cast<int>(m_action.yOffset * 16.f));
+                m_pFont->draw(m_action.text, textPos + Vector2(0, -1), OCenter, OColorHex(204631));
+                m_pFont->draw(m_action.text, textPos + Vector2(0, 1), OCenter, OColorHex(204631));
+                m_pFont->draw(m_action.text, textPos, OCenter, OColorHex(d7e894));
                 break;
             }
         }
@@ -1148,24 +1427,14 @@ void Board::drawPathSection(const Point& at, const Path& path)
     }
 }
 
-void Board::updateFogOfWar()
+void Board::updateFogOfWar(const CharactereRef& pHero)
 {
+    auto from = pHero->getPosition();
     for (auto& tile : m_hallwayTiles)
     {
         if (!m_visibility[tile.x][tile.y])
         {
-            // trace visibility with heroes
-            bool visible = false;
-            for (auto& pHero : m_heroes)
-            {
-                auto from = pHero->getPosition();
-                if (lineOfSight(from, tile))
-                {
-                    visible = true;
-                    break;
-                }
-            }
-            m_visibility[tile.x][tile.y] = visible;
+            m_visibility[tile.x][tile.y] = lineOfSight(from, tile);
         }
     }
 }
@@ -1182,7 +1451,15 @@ void Board::makeRoomVisible(const RoomRef& pRoom)
         auto& tiles = pRoom->getTiles();
         for (auto& point : tiles)
         {
-            m_visibility[point.x][point.y] = true;
+            if (!m_visibility[point.x][point.y])
+            {
+                m_visibility[point.x][point.y] = true;
+                auto pMonster = getEntityAt<Monster>(point);
+                if (pMonster)
+                {
+                    m_characteres.push_back(pMonster);
+                }
+            }
         }
     }
 }
@@ -1250,4 +1527,138 @@ bool Board::lineOfSight(Point from, Point to)
         lastPos = pos;
     }
     return true;
+}
+
+/**
+Return the least possible cost between 2 states. For example, if your pathfinding
+is based on distance, this is simply the straight distance between 2 points on the
+map. If you pathfinding is based on minimum time, it is the minimal travel time
+between 2 points given the best possible terrain.
+*/
+float Board::LeastCostEstimate(void* stateStart, void* stateEnd)
+{
+    auto start = stateToTile(stateStart);
+    auto end = stateToTile(stateEnd);
+    auto disSquared = (end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y);
+    return std::sqrtf(static_cast<float>(disSquared));
+}
+
+/**
+Return the exact cost from the given state to all its neighboring states. This
+may be called multiple times, or cached by the solver. It *must* return the same
+exact values for every call to MicroPather::Solve(). It should generally be a simple,
+fast function with no callbacks into the pather.
+*/
+void Board::AdjacentCost(void* state, MP_VECTOR< micropather::StateCost > *adjacent)
+{
+    auto tile = stateToTile(state);
+    micropather::StateCost stateCost;
+    stateCost.cost = 1.f;
+    if (isMovableToIgnoreCharacters(tile + Point(1, 0), tile) && m_visibility[tile.x + 1][tile.y])
+    {
+        stateCost.state = tileToState(tile + Point(1, 0));
+        adjacent->push_back(stateCost);
+    }
+    if (isMovableToIgnoreCharacters(tile + Point(-1, 0), tile) && m_visibility[tile.x - 1][tile.y])
+    {
+        stateCost.state = tileToState(tile + Point(-1, 0));
+        adjacent->push_back(stateCost);
+    }
+    if (isMovableToIgnoreCharacters(tile + Point(0, 1), tile) && m_visibility[tile.x][tile.y + 1])
+    {
+        stateCost.state = tileToState(tile + Point(0, 1));
+        adjacent->push_back(stateCost);
+    }
+    if (isMovableToIgnoreCharacters(tile + Point(0, -1), tile) && m_visibility[tile.x][tile.y - 1])
+    {
+        stateCost.state = tileToState(tile + Point(0, -1));
+        adjacent->push_back(stateCost);
+    }
+}
+
+/**
+This function is only used in DEBUG mode - it dumps output to stdout. Since void*
+aren't really human readable, normally you print out some concise info (like "(1,2)")
+without an ending newline.
+*/
+void Board::PrintStateInfo(void* state)
+{
+    auto tile = stateToTile(state);
+    OLog("(" + std::to_string(tile.x) + ", " + std::to_string(tile.y) + ")");
+}
+
+Point Board::stateToTile(void* state) const
+{
+    auto statei = static_cast<int>(reinterpret_cast<uintptr_t>(state));
+    Point tile;
+    tile.y = statei / BOARD_WIDTH;
+    tile.x = statei - tile.y * BOARD_WIDTH;
+    return tile;
+}
+
+void* Board::tileToState(const Point& tile) const
+{
+    auto statei = tile.y * BOARD_WIDTH + tile.x;
+    return reinterpret_cast<void*>(static_cast<uintptr_t>(statei));
+}
+
+void Board::aiMove(const MonsterRef& pMonster)
+{
+    if (!m_playerTurn.hasProgressMoved)
+    {
+        m_playerTurn.walkedTiles.push_back(pMonster->getPosition());
+        m_playerTurn.hasProgressMoved = true;
+    }
+    if (static_cast<int>(m_playerTurn.walkedTiles.size()) > pMonster->getDeplacement())
+    {
+        m_playerTurn.hasMoved = true;
+        return;
+    }
+    auto monsterState = tileToState(pMonster->getPosition());
+    float totalCost;
+    bool found = false;
+    Point bestPath;
+    float bestCost = 100000.f;
+    for (auto& pHero : m_heroes)
+    {
+        MP_VECTOR<void*> path;
+        switch (m_pPather->Solve(monsterState, tileToState(pHero->getPosition()), &path, &totalCost))
+        {
+            case micropather::MicroPather::SOLVED:
+                if (path.size() > 2)
+                {
+                    if (totalCost < bestCost)
+                    {
+                        bestCost = totalCost;
+                        bestPath = stateToTile(path[1]);
+                        found = true;
+                    }
+                }
+                break;
+            case micropather::MicroPather::NO_SOLUTION:
+                // Do nothing
+                break;
+            case micropather::MicroPather::START_END_SAME:
+                // not supposed to happen.
+                break;
+        }
+    }
+    if (found)
+    {
+        auto moveTo = bestPath;
+        if (isMovableTo(moveTo, pMonster->getPosition()))
+        {
+            m_state = State::Walking;
+            m_action.timer.start(.15f, [this, moveTo]
+            {
+                m_playerTurn.walkedTiles.push_back(moveTo);
+            });
+            pMonster->moveTo(moveTo, [this, moveTo]
+            {
+                m_state = State::Idle;
+            });
+            return;
+        }
+    }
+    m_playerTurn.hasMoved = true;
 }

@@ -27,6 +27,11 @@ public:
     int getEsprit() const;
     int getDeplacement() const;
 
+    int rollAttaque() const;
+    virtual int rollDefense() const;
+
+    int damage(int value);
+
 protected:
     OSpriteAnimInstance m_spriteAnimInstance;
     OAnimPoint m_moveAnim;

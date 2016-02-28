@@ -14,6 +14,8 @@ Entity::Entity(const Point& position, Direction direction)
     , m_id(++g_id)
 {
     m_angleOffset = ORandFloat(-2.f, 2.f);
+    m_size.x = 1;
+    m_size.y = 1;
 }
 
 Entity::~Entity()

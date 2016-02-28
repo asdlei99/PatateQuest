@@ -1,10 +1,10 @@
 #pragma once
-#include "Charactere.h"
+#include "Hero.h"
 
 #include "onut/ForwardDeclaration.h"
 ForwardDeclare(Barbare);
 
-class Barbare : public Charactere
+class Barbare : public Hero
 {
 public:
     Barbare(const Point& position = {0, 0}, Direction direction = Direction::Front);
