@@ -237,3 +237,8 @@ _Pvt_Extensions
 
 onut/
 making/
+fceux-2.2.1-win32/
+Tools/
+*.nes
+*.fns
+*.deb

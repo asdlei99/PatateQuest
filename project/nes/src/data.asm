@@ -1,0 +1,5 @@
+tilesetTop_data: .incbin "assets/tilesetTop.bin"
+tilesetBottom_data: .incbin "assets/tilesetBottom.bin"
+board_data: .incbin "assets/board.bin"
+;objects_data: .incbin "assets/objects.bin"
+board_pal: .incbin "assets/board.pal"
