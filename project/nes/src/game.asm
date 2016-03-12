@@ -602,36 +602,17 @@ func_GAME_STATE_SHOWING_MAP:
     stx game_lastCamCornerTimer
     jmp continueAnim
 switchCorner:
-    ldx #120
+    ldx #CAM_NEXT_WAY_POINT_DELAY
     stx game_lastCamCornerTimer
     lda game_lastCamCorner
-    cmp #1
-    beq corner2
-    cmp #2
-    beq corner3
-    cmp #3
-    beq corner4
-corner1:
-    lda #0
-    ldx #0
+    asl A
+    tax
+    lda AnimCamPos, x
+    tay
+    lda AnimCamPos + 1, x
+    tax
+    tya
     jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner2:
-    lda #0
-    ldx #128
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner3:
-    lda #224
-    ldx #128
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner4:
-    lda #224
-    ldx #0
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-finishCornerSwitch:
     ldx game_lastCamCorner
     inx
     txa
@@ -657,3 +638,9 @@ func_GAME_STATE_PLAY:
 ; Include game data
 ;-----------------------------------------------------------------------------------------
     .include "src/data.asm"
+
+;-----------------------------------------------------------------------------------------
+; Some constants things
+;-----------------------------------------------------------------------------------------
+AnimCamPos: .db 0, 0, 0, 128, 224, 128, 224, 0
+CAM_NEXT_WAY_POINT_DELAY = 90
