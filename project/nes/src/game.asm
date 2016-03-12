@@ -6,8 +6,9 @@ SCREEN_HEIGHT = 15
 SCREEN_CENTER_X = 8
 SCREEN_CENTER_Y = 7
 
-GAME_STATE_LOADING_SECTION = 0
-GAME_STATE_PLAY = 1
+GAME_STATE_SHOWING_MAP = 0
+GAME_STATE_LOADING_SECTION = 1
+GAME_STATE_PLAY = 2
 
 TILE_VISIBLE_BIT = %10000000
 TILE_PASSABLE_LESS_THAN = 20
@@ -33,26 +34,24 @@ game_board:             .rs (MAP_REAL_WIDTH * MAP_HEIGHT); 32 * 23 tiles
 ;-----------------------------------------------------------------------------------------
 ClearBoard:
     PUSH_ALL
+    ldx #(MAP_REAL_WIDTH * MAP_HEIGHT / 8)
+	lda #$00
+    clrmboard:
+	sta game_board, x
+	sta game_board + 92, x
+	sta game_board + 92 * 2, x
+	sta game_board + 92 * 3, x
+	sta game_board + 92 * 4, x
+	sta game_board + 92 * 5, x
+	sta game_board + 92 * 6, x
+	sta game_board + 92 * 7, x
+	dex
+	bne clrmboard
 
-    LOAD_ADDR board_data, tmp1
-    LOAD_ADDR game_board, tmp2
-
-    ldx #0
-    ClearBoard_loopY:
-        ldy #0
-        ClearBoard_loopX:
-            lda [tmp1], y
-            sta [tmp2], y
-            iny ; loop logic
-            cpy #MAP_REAL_WIDTH
-            bne ClearBoard_loopX
-        lda #MAP_REAL_WIDTH
-        ADD_TO_ADDR tmp1
-        lda #MAP_REAL_WIDTH
-        ADD_TO_ADDR tmp2
-        inx ; loop logic
-        cpx #MAP_HEIGHT
-        bne ClearBoard_loopY
+    ;--- TEMP, put a table somewhere
+    ldx #8
+    lda #100
+    sta game_board + (MAP_REAL_WIDTH * 8), x
 
     POP_ALL
     rts
@@ -106,7 +105,7 @@ FillRow:
     lda tmp2
     sta $2006
 
-    LOAD_ADDR game_board, tmp4
+    LOAD_ADDR board_data, tmp4
 
     ldx tmp8
     FillRow_incBoard:
@@ -157,7 +156,7 @@ FillRow:
     lda tmp2
     sta $2006
 
-    LOAD_ADDR game_board, tmp4
+    LOAD_ADDR board_data, tmp4
 
     ldx tmp8
     FillRow_incBoard2:
@@ -217,7 +216,7 @@ FillTopRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR game_board, tmp5
+    LOAD_ADDR board_data, tmp5
 
     ldx tmp8
     FillTopRowDeferred_incBoard:
@@ -284,7 +283,7 @@ FillBottomRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR game_board, tmp5
+    LOAD_ADDR board_data, tmp5
 
     ldx tmp8
     FillBottomRowDeferred_incBoard:
@@ -404,14 +403,9 @@ OnInit:
     lda #BG_PATTERN0 ; Our background tiles are on the first pattern
     jsr ppu_SetBGPattern
 
-    ;--- Set initial camera pos to center
-   ; lda #224
-   ; sta game_cameraAnim
-   ; lda #128
-   ; sta game_cameraAnim + 1
-   ; lda #0;(MAP_WIDTH / 2)
-   ; ldx #0;(MAP_HEIGHT / 2)
-   ; jsr SetCameraPosAnimate
+    ;--- Set initial state
+    lda #GAME_STATE_SHOWING_MAP
+    sta game_state
 
     rts
 
@@ -420,49 +414,33 @@ OnInit:
 ;-----------------------------------------------------------------------------------------
     .bank 0
 OnFrame:
-    ldx game_lastCamCornerTimer
-    beq switchCorner
-    dex
-    stx game_lastCamCornerTimer
-    jmp continueAnim
-switchCorner:
-    ldx #120
-    stx game_lastCamCornerTimer
-    lda game_lastCamCorner
-    cmp #1
-    beq corner2
-    cmp #2
-    beq corner3
-    cmp #3
-    beq corner4
-corner1:
-    lda #0
-    ldx #0
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner2:
-    lda #0
-    ldx #128
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner3:
-    lda #224
-    ldx #128
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-corner4:
-    lda #224
-    ldx #0
-    jsr SetCameraPosAnimate
-    jmp finishCornerSwitch
-finishCornerSwitch:
-    ldx game_lastCamCorner
-    inx
-    txa
-    and #%00000011 ; a %= 4
-    sta game_lastCamCorner
-continueAnim:
+    ;--- switch (game_state) {
+    lda game_state
+    cmp #GAME_STATE_SHOWING_MAP
+    bne not_GAME_STATE_SHOWING_MAP
+    jsr func_GAME_STATE_SHOWING_MAP ; case GAME_STATE_SHOWING_MAP:
+    jmp done_GAME_STATE ; break;
+not_GAME_STATE_SHOWING_MAP:
+    cmp #GAME_STATE_LOADING_SECTION
+    bne not_GAME_STATE_LOADING_SECTION
+    jsr func_GAME_STATE_LOADING_SECTION ; case GAME_STATE_LOADING_SECTION:
+    jmp done_GAME_STATE ; break;
+not_GAME_STATE_LOADING_SECTION:
+    cmp #GAME_STATE_PLAY
+    bne not_GAME_STATE_PLAY
+    jsr func_GAME_STATE_PLAY ; case GAME_STATE_PLAY:
+    jmp done_GAME_STATE ; break;
+not_GAME_STATE_PLAY:
+done_GAME_STATE:  ; }
+    rts
 
+;-----------------------------------------------------------------------------------------
+; This function scrolls the camera.
+; When scrolling in Y, tiles need to be added at the bottom or at the top. It gets
+; quite complex
+;-----------------------------------------------------------------------------------------
+UpdateCameraScroll:
+    PUSH_ALL
     ;--- Cam before in Y
     lda game_cameraAnim + 1
     sta tmp7 + 1
@@ -535,6 +513,68 @@ skipDrawTopRow:
 skipDrawBottomRow:
 
 scrollDrawingDone:
+    POP_ALL
+    rts
+
+;-----------------------------------------------------------------------------------------
+; This state shows the map with an animation from each corners
+;-----------------------------------------------------------------------------------------
+func_GAME_STATE_SHOWING_MAP:
+    ldx game_lastCamCornerTimer
+    beq switchCorner
+    dex
+    stx game_lastCamCornerTimer
+    jmp continueAnim
+switchCorner:
+    ldx #120
+    stx game_lastCamCornerTimer
+    lda game_lastCamCorner
+    cmp #1
+    beq corner2
+    cmp #2
+    beq corner3
+    cmp #3
+    beq corner4
+corner1:
+    lda #0
+    ldx #0
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner2:
+    lda #0
+    ldx #128
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner3:
+    lda #224
+    ldx #128
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner4:
+    lda #224
+    ldx #0
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+finishCornerSwitch:
+    ldx game_lastCamCorner
+    inx
+    txa
+    and #%00000011 ; a %= 4
+    sta game_lastCamCorner
+continueAnim:
+    jsr UpdateCameraScroll
+    rts
+
+;-----------------------------------------------------------------------------------------
+; 
+;-----------------------------------------------------------------------------------------
+func_GAME_STATE_LOADING_SECTION:
+    rts
+
+;-----------------------------------------------------------------------------------------
+; 
+;-----------------------------------------------------------------------------------------
+func_GAME_STATE_PLAY:
     rts
 
 ;-----------------------------------------------------------------------------------------
