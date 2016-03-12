@@ -29,7 +29,7 @@ cmd_pal0        .rs 16  ; 46 bg palette
 cmd_pal1        .rs 16  ; 56 sprite palette
 
     .rsset $0300
-cmd_raw         .rs 256 ; 0x0300 Command buffer
+cmd_raw         .rs 256 ; 0x0400 Command buffer
 
 ;-----------------------------------------------------------------------------------------
 ; Constants
@@ -280,7 +280,7 @@ ppu_DrawRowRLE:
 ; @tmp2 Target GPU address
 ;-----------------------------------------------------------------------------------------
 ppu_BeginRow:
-    sty tmp4
+    sty tmp1
     ldy cmd_rawCount
     sta cmd_raw, y
     iny
@@ -291,7 +291,7 @@ ppu_BeginRow:
     sta cmd_raw, y
     iny
     sty cmd_rawCount
-    ldy tmp4
+    ldy tmp1
     rts
 
 ;-----------------------------------------------------------------------------------------

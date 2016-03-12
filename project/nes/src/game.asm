@@ -19,9 +19,11 @@ game_UNUSED: .rs 1 ; x11
 game_camera: .rs 2 ; x12
 game_cameraAnim: .rs 2 ; x14
 game_lastRowLoaded: .rs 1 ; x15
+game_lastCamCorner: .rs 1 ; x16
+game_lastCamCornerTimer: .rs 1 ; x17
 
-    .rsset $0300
-game_board:             .rs (MAP_REAL_WIDTH * MAP_HEIGHT); 26 * 19 tiles
+    .rsset $0400
+game_board:             .rs (MAP_REAL_WIDTH * MAP_HEIGHT); 32 * 23 tiles
 
     .bank 0
     ;.include "src/tiles.asm"
@@ -342,7 +344,7 @@ RefreshScreen:
     RefreshScreen_loopRows:
         jsr FillRow
         inx ; loop logic
-        cpx #SCREEN_HEIGHT
+        cpx #(SCREEN_HEIGHT)
         bne RefreshScreen_loopRows
     POP_ALL
     rts
@@ -381,8 +383,6 @@ SetCameraPosAnimateY_skipMaxClamp:
 ; Initialize method for the game
 ;-----------------------------------------------------------------------------------------
 OnInit:
-    pha
-
     jsr ppu_Off ; Begin loading
 
     ;--- load board
@@ -405,11 +405,14 @@ OnInit:
     jsr ppu_SetBGPattern
 
     ;--- Set initial camera pos to center
-    lda #(MAP_WIDTH / 2)
-    ldx #(MAP_HEIGHT / 2)
-    jsr SetCameraPosAnimate
+   ; lda #224
+   ; sta game_cameraAnim
+   ; lda #128
+   ; sta game_cameraAnim + 1
+   ; lda #0;(MAP_WIDTH / 2)
+   ; ldx #0;(MAP_HEIGHT / 2)
+   ; jsr SetCameraPosAnimate
 
-    pla
     rts
 
 ;-----------------------------------------------------------------------------------------
@@ -417,8 +420,52 @@ OnInit:
 ;-----------------------------------------------------------------------------------------
     .bank 0
 OnFrame:
+    ldx game_lastCamCornerTimer
+    beq switchCorner
+    dex
+    stx game_lastCamCornerTimer
+    jmp continueAnim
+switchCorner:
+    ldx #120
+    stx game_lastCamCornerTimer
+    lda game_lastCamCorner
+    cmp #1
+    beq corner2
+    cmp #2
+    beq corner3
+    cmp #3
+    beq corner4
+corner1:
+    lda #0
+    ldx #0
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner2:
+    lda #0
+    ldx #128
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner3:
+    lda #224
+    ldx #128
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+corner4:
+    lda #224
+    ldx #0
+    jsr SetCameraPosAnimate
+    jmp finishCornerSwitch
+finishCornerSwitch:
+    ldx game_lastCamCorner
+    inx
+    txa
+    and #%00000011 ; a %= 4
+    sta game_lastCamCorner
+continueAnim:
+
     ;--- Cam before in Y
     lda game_cameraAnim + 1
+    sta tmp7 + 1
     DIV16
     sta tmp7
 
@@ -428,7 +475,39 @@ OnFrame:
     EASE_OUT game_cameraAnim + 1, game_camera + 1
     stx cmd_scrollY
 
-    ;--- compare with cam Y before. If it changed we need to draw new rows in the command buffer
+    ;--- When scrolling up or down we need to update the board tiles
+    ;--- First, determine if we move up or down
+    lda game_cameraAnim + 1
+    cmp tmp7 + 1
+    beq scrollDrawingDone
+    bcs doPositiveScrollLogic
+
+doNegativeScrollLogic:
+    ;--- Bottom row
+    lda game_cameraAnim + 1
+    DIV16
+    cmp tmp7
+    beq negSkipDrawBottomRow
+    tax
+    jsr FillBottomRowDeferred
+negSkipDrawBottomRow:
+
+    ;--- Top row
+    lda tmp7 + 1
+    clc
+    adc #8
+    DIV16
+    sta tmp7
+    lda game_cameraAnim + 1
+    DIV16
+    cmp tmp7
+    beq scrollDrawingDone
+    ldx tmp7
+    jsr FillTopRowDeferred
+
+    jmp scrollDrawingDone
+
+doPositiveScrollLogic:
     ;--- Top row
     lda game_cameraAnim + 1
     clc
@@ -436,9 +515,6 @@ OnFrame:
     DIV16
     cmp tmp7
     beq skipDrawTopRow
-    sec
-    sbc tmp7
-    bmi skipDrawTopRow
     lda tmp7
     clc
     adc #(SCREEN_HEIGHT)
@@ -446,13 +522,11 @@ OnFrame:
     jsr FillTopRowDeferred
 skipDrawTopRow:
 
+    ;--- Bottom row
     lda game_cameraAnim + 1
     DIV16
     cmp tmp7
     beq skipDrawBottomRow
-    sec
-    sbc tmp7
-    bmi skipDrawBottomRow
     lda tmp7
     clc
     adc #(SCREEN_HEIGHT)
@@ -460,6 +534,7 @@ skipDrawTopRow:
     jsr FillBottomRowDeferred
 skipDrawBottomRow:
 
+scrollDrawingDone:
     rts
 
 ;-----------------------------------------------------------------------------------------
