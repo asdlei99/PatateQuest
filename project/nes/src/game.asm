@@ -12,7 +12,6 @@ GAME_STATE_PLAY = 2
 
 TILE_VISIBLE_BIT = %10000000
 TILE_PASSABLE_LESS_THAN = 20
-TILE_ID_BITS = %01111111
 
     .rsset $0010
 game_state: .rs 1 ; x10 Game state
@@ -48,10 +47,32 @@ ClearBoard:
 	dex
 	bne clrmboard
 
+    ; 22, 29, 78, 84, 112, 116
+
     ;--- TEMP, put a table somewhere
-    ldx #8
-    lda #100
-    sta game_board + (MAP_REAL_WIDTH * 8), x
+    ldx #20
+    lda #109
+    sta game_board + (MAP_REAL_WIDTH * 10), x
+
+    ldx #21
+    lda #84
+    sta game_board + (MAP_REAL_WIDTH * 10), x
+
+    ldx #22
+    lda #22
+    sta game_board + (MAP_REAL_WIDTH * 10), x
+
+    ldx #20
+    lda #112
+    sta game_board + (MAP_REAL_WIDTH * 11), x
+
+    ldx #21
+    lda #116
+    sta game_board + (MAP_REAL_WIDTH * 11), x
+
+    ldx #22
+    lda #29
+    sta game_board + (MAP_REAL_WIDTH * 11), x
 
     POP_ALL
     rts
@@ -90,6 +111,113 @@ getRowAddr_mod15_done:
     rts
 
 ;-----------------------------------------------------------------------------------------
+; Draw half of a tile. It will consider the tile from objects layer if it's non-zero,
+; otherwise it will use the background tile
+; @y = read offset
+; @tmp4 = board_data
+; @tmp5 = game_board
+;-----------------------------------------------------------------------------------------
+drawTopTile:
+    ;--- Top Left
+    lda [tmp5], y
+    tax
+    lda tileset1_data, x
+    cmp #0
+    bne drawTopLeftDone
+    lda [tmp4], y
+    tax
+    lda tileset1_data, x
+drawTopLeftDone:
+    sta $2007
+    ;--- Top Right
+    lda [tmp5], y
+    tax
+    lda tileset2_data, x
+    cmp #0
+    bne drawTopRightDone
+    lda [tmp4], y
+    tax
+    lda tileset2_data, x
+drawTopRightDone:
+    sta $2007
+    rts
+
+drawBottomTile:
+    ;--- Top Left
+    lda [tmp5], y
+    tax
+    lda tileset3_data, x
+    cmp #0
+    bne drawBottomLeftDone
+    lda [tmp4], y
+    tax
+    lda tileset3_data, x
+drawBottomLeftDone:
+    sta $2007
+    ;--- Top Right
+    lda [tmp5], y
+    tax
+    lda tileset4_data, x
+    cmp #0
+    bne drawBottomRightDone
+    lda [tmp4], y
+    tax
+    lda tileset4_data, x
+drawBottomRightDone:
+    sta $2007
+    rts
+
+drawTopTileDef:
+    ;--- Top Left
+    lda [tmp5], y
+    tax
+    lda tileset1_data, x
+    cmp #0
+    bne drawTopLeftDoneDef
+    lda [tmp4], y
+    tax
+    lda tileset1_data, x
+drawTopLeftDoneDef:
+    jsr ppu_Draw
+    ;--- Top Right
+    lda [tmp5], y
+    tax
+    lda tileset2_data, x
+    cmp #0
+    bne drawTopRightDoneDef
+    lda [tmp4], y
+    tax
+    lda tileset2_data, x
+drawTopRightDoneDef:
+    jsr ppu_Draw
+    rts
+
+drawBottomTileDef:
+    ;--- Top Left
+    lda [tmp5], y
+    tax
+    lda tileset3_data, x
+    cmp #0
+    bne drawBottomLeftDoneDef
+    lda [tmp4], y
+    tax
+    lda tileset3_data, x
+drawBottomLeftDoneDef:
+    jsr ppu_Draw
+    ;--- Top Right
+    lda [tmp5], y
+    tax
+    lda tileset4_data, x
+    cmp #0
+    bne drawBottomRightDoneDef
+    lda [tmp4], y
+    tax
+    lda tileset4_data, x
+drawBottomRightDoneDef:
+    jsr ppu_Draw
+    rts
+
+;-----------------------------------------------------------------------------------------
 ; Fill both screens with a row
 ; @x = row index
 ;-----------------------------------------------------------------------------------------
@@ -106,6 +234,7 @@ FillRow:
     sta $2006
 
     LOAD_ADDR board_data, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillRow_incBoard:
@@ -113,35 +242,21 @@ FillRow:
         beq FillRow_incBoardDone
         lda #MAP_REAL_WIDTH
         ADD_TO_ADDR tmp4
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp5
         dex
         jmp FillRow_incBoard
     FillRow_incBoardDone:
 
     ldy #0
     FillRow_loopXTop:
-        lda [tmp4], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetTop_data, x
-        sta $2007
-        inx
-        lda tilesetTop_data, x
-        sta $2007
+        jsr drawTopTile
         iny ; loop logic
         cpy #SCREEN_WIDTH
         bne FillRow_loopXTop
     ldy #0
     FillRow_loopXBottom:
-        lda [tmp4], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetBottom_data, x
-        sta $2007
-        inx
-        lda tilesetBottom_data, x
-        sta $2007
+        jsr drawBottomTile
         iny ; loop logic
         cpy #SCREEN_WIDTH
         bne FillRow_loopXBottom
@@ -157,6 +272,7 @@ FillRow:
     sta $2006
 
     LOAD_ADDR board_data, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillRow_incBoard2:
@@ -164,38 +280,26 @@ FillRow:
         beq FillRow_incBoardDone2
         lda #MAP_REAL_WIDTH
         ADD_TO_ADDR tmp4
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp5
         dex
         jmp FillRow_incBoard2
     FillRow_incBoardDone2:
 
     lda #(SCREEN_WIDTH)
     ADD_TO_ADDR tmp4
+    lda #(SCREEN_WIDTH)
+    ADD_TO_ADDR tmp5
 
     ldy #0
     FillRow_loopXTop2:
-        lda [tmp4], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetTop_data, x
-        sta $2007
-        inx
-        lda tilesetTop_data, x
-        sta $2007
+        jsr drawTopTile
         iny ; loop logic
         cpy #SCREEN_WIDTH
         bne FillRow_loopXTop2
     ldy #0
     FillRow_loopXBottom2:
-        lda [tmp4], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetBottom_data, x
-        sta $2007
-        inx
-        lda tilesetBottom_data, x
-        sta $2007
+        jsr drawBottomTile
         iny ; loop logic
         cpy #SCREEN_WIDTH
         bne FillRow_loopXBottom2
@@ -216,11 +320,14 @@ FillTopRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR board_data, tmp5
+    LOAD_ADDR board_data, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillTopRowDeferred_incBoard:
         beq FillTopRowDeferred_incBoardDone
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp4
         lda #MAP_REAL_WIDTH
         ADD_TO_ADDR tmp5
         dex
@@ -229,16 +336,7 @@ FillTopRowDeferred:
 
     ldy #0
     FillTopRowDeferred_loopX:
-        lda [tmp5], y
-        and #TILE_ID_BITS
-        clc
-        asl A
-        tax
-        lda tilesetTop_data, x
-        jsr ppu_Draw
-        inx
-        lda tilesetTop_data, x
-        jsr ppu_Draw
+        jsr drawTopTileDef
         iny ; loop logic
         cpy #(SCREEN_WIDTH)
         bne FillTopRowDeferred_loopX
@@ -251,16 +349,7 @@ FillTopRowDeferred:
     jsr ppu_BeginRow
 
     FillTopRowDeferred_loopX2:
-        lda [tmp5], y
-        and #TILE_ID_BITS
-        clc
-        asl A
-        tax
-        lda tilesetTop_data, x
-        jsr ppu_Draw
-        inx
-        lda tilesetTop_data, x
-        jsr ppu_Draw
+        jsr drawTopTileDef
         iny ; loop logic
         cpy #(SCREEN_WIDTH * 2)
         bne FillTopRowDeferred_loopX2
@@ -283,11 +372,14 @@ FillBottomRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR board_data, tmp5
+    LOAD_ADDR board_data, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillBottomRowDeferred_incBoard:
         beq FillBottomRowDeferred_incBoardDone
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp4
         lda #MAP_REAL_WIDTH
         ADD_TO_ADDR tmp5
         dex
@@ -296,15 +388,7 @@ FillBottomRowDeferred:
 
     ldy #0
     FillBottomRowDeferred_loopX:
-        lda [tmp5], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetBottom_data, x
-        jsr ppu_Draw
-        inx
-        lda tilesetBottom_data, x
-        jsr ppu_Draw
+        jsr drawBottomTileDef
         iny ; loop logic
         cpy #SCREEN_WIDTH
         bne FillBottomRowDeferred_loopX
@@ -317,15 +401,7 @@ FillBottomRowDeferred:
     jsr ppu_BeginRow
 
     FillBottomRowDeferred_loopX2:
-        lda [tmp5], y
-        and #TILE_ID_BITS
-        asl A
-        tax
-        lda tilesetBottom_data, x
-        jsr ppu_Draw
-        inx
-        lda tilesetBottom_data, x
-        jsr ppu_Draw
+        jsr drawBottomTileDef
         iny ; loop logic
         cpy #(SCREEN_WIDTH * 2)
         bne FillBottomRowDeferred_loopX2

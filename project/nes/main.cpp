@@ -191,22 +191,31 @@ Tileset buildTileset(tinyxml2::XMLElement* pXMLmap)
 void saveTileset(const Tileset& tileset)
 {
     FILE* pFic;
-    fopen_s(&pFic, "assets/tilesetTop.bin", "wb");
+    fopen_s(&pFic, "assets/tileset1.bin", "wb");
     for (auto& tile : tileset)
     {
         uint8_t tile1 = static_cast<uint8_t>(tile);
         fwrite(&tile1, 1, 1, pFic);
-        tile1 = static_cast<uint8_t>(tile >> 8);
+    }
+    fclose(pFic);
+    fopen_s(&pFic, "assets/tileset2.bin", "wb");
+    for (auto& tile : tileset)
+    {
+        uint8_t tile1 = static_cast<uint8_t>(tile >> 8);
         fwrite(&tile1, 1, 1, pFic);
     }
     fclose(pFic);
-
-    fopen_s(&pFic, "assets/tilesetBottom.bin", "wb");
+    fopen_s(&pFic, "assets/tileset3.bin", "wb");
     for (auto& tile : tileset)
     {
         uint8_t tile1 = static_cast<uint8_t>(tile >> 16);
         fwrite(&tile1, 1, 1, pFic);
-        tile1 = static_cast<uint8_t>(tile >> 24);
+    }
+    fclose(pFic);
+    fopen_s(&pFic, "assets/tileset4.bin", "wb");
+    for (auto& tile : tileset)
+    {
+        uint8_t tile1 = static_cast<uint8_t>(tile >> 24);
         fwrite(&tile1, 1, 1, pFic);
     }
     fclose(pFic);
@@ -226,7 +235,7 @@ int main()
     // Save board
     saveBoard(tileset, pXMLmap);
 
-    //auto objects = loadObjects("Objects", pXMLmap);
+    auto objects = loadObjects("Objects", pXMLmap);
     //saveObjects(objects);
 
     //Layer sprites;
