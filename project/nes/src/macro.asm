@@ -64,6 +64,21 @@
     pla
     .endm
 
+    .macro MUL16
+    asl A
+    asl A
+    asl A
+    asl A
+    .endm
+
+    .macro DIV16
+    ror A
+    ror A
+    ror A
+    ror A
+    and #%00001111
+    .endm
+
 ;-----------------------------------------------------------------------------------------
 ; Animates a variable from X to A with an EASY_OUT type anim.
 ; Useful for camera animation.
@@ -74,6 +89,7 @@ EaseOut2:
     cmp tmp8
     beq EaseOut2_done
     bcc EaseOut2_greater
+    jmp EaseOut2_lowSkip3  ; TEST
     tya
     sec
     sbc tmp8
@@ -92,6 +108,7 @@ EaseOut2_lowSkip3:
     inx
     rts
 EaseOut2_greater:
+    jmp EaseOut2_greaterSkip3 ; TEST
     sty tmp8
     txa
     sec

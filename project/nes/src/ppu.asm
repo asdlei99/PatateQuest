@@ -27,7 +27,9 @@ cmd_rawCount    .rs 1   ; 45
 ;    +------ 4 Background pattern table
 cmd_pal0        .rs 16  ; 46 bg palette
 cmd_pal1        .rs 16  ; 56 sprite palette
-cmd_raw         .rs 154 ; 66
+
+    .rsset $0300
+cmd_raw         .rs 256 ; 0x0300 Command buffer
 
 ;-----------------------------------------------------------------------------------------
 ; Constants
@@ -197,6 +199,12 @@ SetPal1_loop:
 ;-----------------------------------------------------------------------------------------
 ppu_Submit:
 	pha ; push
+    tya
+    pha
+
+    ldy cmd_rawCount
+    lda #0
+    sta cmd_raw, y
 
     lda #1
     sta cmd_enabled
@@ -205,6 +213,8 @@ WaitCmdFeed:
     bit cmd_enabled
     bne WaitCmdFeed
 
+    pla
+    tay
     pla ; pop
     rts
     
@@ -237,6 +247,64 @@ ppu_On:
 	lda #%00011110
 	sta $2001
     pla
+    rts
+
+;-----------------------------------------------------------------------------------------
+; Draw a row of a repeated character
+; @a = repeat count
+; @x = character
+; @tmp2 Target GPU address
+;-----------------------------------------------------------------------------------------
+ppu_DrawRowRLE:
+    sty tmp4
+    ldy cmd_rawCount
+    ora #%10000000
+    sta cmd_raw, y
+    iny
+    lda tmp2 + 1
+    sta cmd_raw, y
+    iny
+    lda tmp2
+    sta cmd_raw, y
+    iny
+    txa
+    sta cmd_raw, y
+    iny
+    sty cmd_rawCount
+    ldy tmp4
+    rts
+
+;-----------------------------------------------------------------------------------------
+; Begin the drawing of a row
+; @a = repeat count
+; @tmp2 Target GPU address
+;-----------------------------------------------------------------------------------------
+ppu_BeginRow:
+    sty tmp4
+    ldy cmd_rawCount
+    sta cmd_raw, y
+    iny
+    lda tmp2 + 1
+    sta cmd_raw, y
+    iny
+    lda tmp2
+    sta cmd_raw, y
+    iny
+    sty cmd_rawCount
+    ldy tmp4
+    rts
+
+;-----------------------------------------------------------------------------------------
+; Draw a character. BeginRow must have been called before
+; @a = character
+;-----------------------------------------------------------------------------------------
+ppu_Draw:
+    sty tmp2
+    ldy cmd_rawCount
+    sta cmd_raw, y
+    iny
+    sty cmd_rawCount
+    ldy tmp2
     rts
     
 ;-----------------------------------------------------------------------------------------
@@ -292,43 +360,24 @@ NMI_pal1Loop:
 	cpy #16
 	bne NMI_pal1Loop
 
-NMI_skipPal1:               ; Update scrolling - Always dirty
-    ;lda #DIRTY_SCROLL         
-    ;bit cmd_dirtyBits
-    ;beq NMI_skipScroll
-    bit $2002
+NMI_skipPal1:               
+    jsr NMI_updateBG        ; Empty the command buffer
+
+    bit $2002               ; Update scrolling - Always dirty
     lda cmd_scrollX
     sta $2005
     lda cmd_scrollY
     sta $2005
 
-NMI_updateBG:
-    bit $2002               
-    ldy cmd_rawCount
-    NMI_updateBG_loop:
-        cpy #0
-        beq NMI_updateBG_done
-        lda cmd_rawCount, y
-        sta $2006
-        iny
-        lda cmd_rawCount, y
-        sta $2006
-        iny
-        lda cmd_rawCount, y
-        sta $2007
-        iny
-        lda cmd_rawCount, y
-        sta $2007
-        dey
-    NMI_updateBG_done:
-
-NMI_skipScroll:             ; Empty the command buffer
 NMI_CmdDone:
     bit $2002               
     lda cmd_bgFlags         ; Always set back the default bg flags
     sta $2000
+
     lda #0
     sta cmd_dirtyBits
+    sta cmd_rawCount
+    sta cmd_raw
     sta cmd_enabled
     pla                     ; pop
     tay
@@ -336,19 +385,52 @@ NMI_CmdDone:
 	tax
 	pla
     rts
-   
- ; SAVE FOR LATER, VTABLE STUFF
-;    ldx #0
-;NMI_CmdLoop:
-;    lda cmd_data, x
-;    inx
-;    asl A
-;    tay
-;    lda cmd_vtable, y
-;    sta $00
-;    iny
-;    lda cmd_vtable, y
-;    sta $01
-;    jmp [$0000]
-;cmd_vtable:
-;    .dw NMI_CmdSetPal0, NMI_CmdSetPal1, NME_CmdSetScrolling, NMI_CmdDone
+
+;-----------------------------------------------------------------------------------------
+; Empties the command buffer
+;-----------------------------------------------------------------------------------------
+NMI_updateBG:
+    ldy #0
+    NMI_updateBG_loop:
+        lda cmd_raw, y
+        beq NMI_updateBG_done
+        iny
+
+        bit $2002 ; reset lo/hi latch
+        ldx cmd_raw, y
+        iny
+        stx $2006
+        ldx cmd_raw, y
+        iny
+        stx $2006
+
+        ldx #%10000000
+        stx tmp1
+        bit tmp1
+        beq NMI_updateBG_copy
+
+        ; RLE
+        and #%01111111
+        tax
+        lda cmd_raw, y
+        iny
+        NMI_updateBG_RLEloop:
+            sta $2007
+            dex
+            bne NMI_updateBG_RLEloop
+        jmp NMI_updateBG_loop
+
+    NMI_updateBG_copy:
+        tax
+        NMI_updateBG_loopNoRLE:
+            lda cmd_raw, y
+            iny
+            sta $2007
+            dex
+            bne NMI_updateBG_loopNoRLE
+
+    NMI_updateBG_endloop:
+        jmp NMI_updateBG_loop
+
+    NMI_updateBG_done:
+    rts

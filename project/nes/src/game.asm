@@ -20,7 +20,7 @@ game_camera: .rs 2 ; x12
 game_cameraAnim: .rs 2 ; x14
 game_lastRowLoaded: .rs 1 ; x15
 
-    .rsset $0200
+    .rsset $0300
 game_board:             .rs (MAP_REAL_WIDTH * MAP_HEIGHT); 26 * 19 tiles
 
     .bank 0
@@ -66,7 +66,7 @@ getRowAddr:
 getRowAddr_mod15_loop:          ; a %= 15
     cmp #15
     bcc getRowAddr_mod15_done
-    clc
+    sec
     sbc #15
     jmp getRowAddr_mod15_loop
 getRowAddr_mod15_done:
@@ -203,6 +203,92 @@ FillRow:
     rts
 
 ;-----------------------------------------------------------------------------------------
+; Fill both screens with a row, in the command buffer. Deferred at the end of the screen
+; @x = row index
+;-----------------------------------------------------------------------------------------
+FillTopRowDeferred:
+    PUSH_Y
+
+    stx tmp8
+    txa
+    jsr getRowAddr
+    lda #32
+    jsr ppu_BeginRow
+
+    LOAD_ADDR game_board, tmp4
+
+    ldx tmp8
+    FillTopRowDeferred_incBoard:
+        beq FillTopRowDeferred_incBoardDone
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp4
+        dex
+        jmp FillTopRowDeferred_incBoard
+    FillTopRowDeferred_incBoardDone:
+
+    ldy #0
+    FillTopRowDeferred_loopXTop:
+        lda [tmp4], y
+        and #TILE_ID_BITS
+        clc
+        asl A
+        tax
+        lda tilesetTop_data, x
+        jsr ppu_Draw
+        inx
+        lda tilesetTop_data, x
+        jsr ppu_Draw
+        iny ; loop logic
+        cpy #(SCREEN_WIDTH)
+        bne FillTopRowDeferred_loopXTop
+    POP_Y
+    rts
+    
+;-----------------------------------------------------------------------------------------
+; Fill both screens with a row, in the command buffer. Deferred at the end of the screen
+; @x = row index
+;-----------------------------------------------------------------------------------------
+FillBottomRowDeferred:
+    PUSH_Y
+
+    stx tmp8
+    txa
+    jsr getRowAddr
+    lda #32
+    ADD_TO_ADDR tmp2
+    lda #32
+    jsr ppu_BeginRow
+
+    LOAD_ADDR game_board, tmp4
+
+    ldx tmp8
+    FillBottomRowDeferred_incBoard:
+        beq FillBottomRowDeferred_incBoardDone
+        lda #MAP_REAL_WIDTH
+        ADD_TO_ADDR tmp4
+        dex
+        jmp FillBottomRowDeferred_incBoard
+    FillBottomRowDeferred_incBoardDone:
+
+    ldy #0
+    FillBottomRowDeferred_loopXBottom:
+        lda [tmp4], y
+        and #TILE_ID_BITS
+        asl A
+        tax
+        lda tilesetBottom_data, x
+        jsr ppu_Draw
+        inx
+        lda tilesetBottom_data, x
+        jsr ppu_Draw
+        iny ; loop logic
+        cpy #SCREEN_WIDTH
+        bne FillBottomRowDeferred_loopXBottom
+
+    POP_Y
+    rts
+
+;-----------------------------------------------------------------------------------------
 ; Shows the board on the screen, fresh. Call only this during loading (ppu off)
 ;-----------------------------------------------------------------------------------------
 RefreshScreen:
@@ -231,10 +317,7 @@ SetCameraPosAnimateX_skipMinClamp:
     bcc SetCameraPosAnimateX_skipMaxClamp
     lda #14
 SetCameraPosAnimateX_skipMaxClamp:
-    asl A
-    asl A
-    asl A
-    asl A
+    MUL16
     sta game_camera
     txa
     sec
@@ -246,10 +329,7 @@ SetCameraPosAnimateY_skipMinClamp:
     bcc SetCameraPosAnimateY_skipMaxClamp
     lda #8
 SetCameraPosAnimateY_skipMaxClamp:
-    asl A
-    asl A
-    asl A
-    asl A
+    MUL16
     sta game_camera + 1
     rts
 
@@ -281,8 +361,8 @@ OnInit:
     jsr ppu_SetBGPattern
 
     ;--- Set initial camera pos to center
-    lda #(MAP_WIDTH / 2)
-    ldx #(MAP_HEIGHT / 2)
+    lda #32;(MAP_WIDTH / 2)
+    ldx #15;(MAP_HEIGHT / 2)
     jsr SetCameraPosAnimate
 
     pla
@@ -293,11 +373,48 @@ OnInit:
 ;-----------------------------------------------------------------------------------------
     .bank 0
 OnFrame:
+    ;--- Cam before in Y
+    lda game_cameraAnim + 1
+    DIV16
+    sta tmp7
+
     ;--- Animate the camera, then set the scroll value
     EASE_OUT game_cameraAnim, game_camera
     stx cmd_scrollX
     EASE_OUT game_cameraAnim + 1, game_camera + 1
     stx cmd_scrollY
+
+    ;--- compare with cam Y before. If it changed we need to draw new rows in the command buffer
+    ;--- Top row
+    lda game_cameraAnim + 1
+    clc
+    adc #8
+    DIV16
+    cmp tmp7
+    beq skipDrawTopRow
+    sec
+    sbc tmp7
+    bmi skipDrawTopRow
+    lda tmp7
+    clc
+    adc #(SCREEN_HEIGHT)
+    tax
+    jsr FillTopRowDeferred
+skipDrawTopRow:
+
+    lda game_cameraAnim + 1
+    DIV16
+    cmp tmp7
+    beq skipDrawBottomRow
+    sec
+    sbc tmp7
+    bmi skipDrawBottomRow
+    lda tmp7
+    clc
+    adc #(SCREEN_HEIGHT)
+    tax
+    jsr FillBottomRowDeferred
+skipDrawBottomRow:
 
     rts
 
