@@ -89,7 +89,7 @@ EaseOut2:
     cmp tmp8
     beq EaseOut2_done
     bcc EaseOut2_greater
-    jmp EaseOut2_lowSkip3  ; TEST
+  ;  jmp EaseOut2_lowSkip3  ; TEST
     tya
     sec
     sbc tmp8
@@ -108,7 +108,7 @@ EaseOut2_lowSkip3:
     inx
     rts
 EaseOut2_greater:
-    jmp EaseOut2_greaterSkip3 ; TEST
+  ;  jmp EaseOut2_greaterSkip3 ; TEST
     sty tmp8
     txa
     sec

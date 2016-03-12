@@ -215,20 +215,20 @@ FillTopRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR game_board, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillTopRowDeferred_incBoard:
         beq FillTopRowDeferred_incBoardDone
         lda #MAP_REAL_WIDTH
-        ADD_TO_ADDR tmp4
+        ADD_TO_ADDR tmp5
         dex
         jmp FillTopRowDeferred_incBoard
     FillTopRowDeferred_incBoardDone:
 
     ldy #0
-    FillTopRowDeferred_loopXTop:
-        lda [tmp4], y
+    FillTopRowDeferred_loopX:
+        lda [tmp5], y
         and #TILE_ID_BITS
         clc
         asl A
@@ -240,7 +240,30 @@ FillTopRowDeferred:
         jsr ppu_Draw
         iny ; loop logic
         cpy #(SCREEN_WIDTH)
-        bne FillTopRowDeferred_loopXTop
+        bne FillTopRowDeferred_loopX
+
+    lda tmp2 + 1
+    clc
+    adc #$04
+    sta tmp2 + 1
+    lda #32
+    jsr ppu_BeginRow
+
+    FillTopRowDeferred_loopX2:
+        lda [tmp5], y
+        and #TILE_ID_BITS
+        clc
+        asl A
+        tax
+        lda tilesetTop_data, x
+        jsr ppu_Draw
+        inx
+        lda tilesetTop_data, x
+        jsr ppu_Draw
+        iny ; loop logic
+        cpy #(SCREEN_WIDTH * 2)
+        bne FillTopRowDeferred_loopX2
+
     POP_Y
     rts
     
@@ -259,20 +282,20 @@ FillBottomRowDeferred:
     lda #32
     jsr ppu_BeginRow
 
-    LOAD_ADDR game_board, tmp4
+    LOAD_ADDR game_board, tmp5
 
     ldx tmp8
     FillBottomRowDeferred_incBoard:
         beq FillBottomRowDeferred_incBoardDone
         lda #MAP_REAL_WIDTH
-        ADD_TO_ADDR tmp4
+        ADD_TO_ADDR tmp5
         dex
         jmp FillBottomRowDeferred_incBoard
     FillBottomRowDeferred_incBoardDone:
 
     ldy #0
-    FillBottomRowDeferred_loopXBottom:
-        lda [tmp4], y
+    FillBottomRowDeferred_loopX:
+        lda [tmp5], y
         and #TILE_ID_BITS
         asl A
         tax
@@ -283,7 +306,28 @@ FillBottomRowDeferred:
         jsr ppu_Draw
         iny ; loop logic
         cpy #SCREEN_WIDTH
-        bne FillBottomRowDeferred_loopXBottom
+        bne FillBottomRowDeferred_loopX
+
+    lda tmp2 + 1
+    clc
+    adc #$04
+    sta tmp2 + 1
+    lda #32
+    jsr ppu_BeginRow
+
+    FillBottomRowDeferred_loopX2:
+        lda [tmp5], y
+        and #TILE_ID_BITS
+        asl A
+        tax
+        lda tilesetBottom_data, x
+        jsr ppu_Draw
+        inx
+        lda tilesetBottom_data, x
+        jsr ppu_Draw
+        iny ; loop logic
+        cpy #(SCREEN_WIDTH * 2)
+        bne FillBottomRowDeferred_loopX2
 
     POP_Y
     rts
@@ -361,8 +405,8 @@ OnInit:
     jsr ppu_SetBGPattern
 
     ;--- Set initial camera pos to center
-    lda #32;(MAP_WIDTH / 2)
-    ldx #15;(MAP_HEIGHT / 2)
+    lda #(MAP_WIDTH / 2)
+    ldx #(MAP_HEIGHT / 2)
     jsr SetCameraPosAnimate
 
     pla

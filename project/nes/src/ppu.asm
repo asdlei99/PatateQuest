@@ -299,12 +299,12 @@ ppu_BeginRow:
 ; @a = character
 ;-----------------------------------------------------------------------------------------
 ppu_Draw:
-    sty tmp2
+    sty tmp1
     ldy cmd_rawCount
     sta cmd_raw, y
     iny
     sty cmd_rawCount
-    ldy tmp2
+    ldy tmp1
     rts
     
 ;-----------------------------------------------------------------------------------------
