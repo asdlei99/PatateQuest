@@ -6,7 +6,7 @@
  <tileset firstgid="257" name="sprites" tilewidth="8" tileheight="8">
   <image source="sprites.bmp" width="128" height="128"/>
  </tileset>
- <layer name="Board" width="64" height="46" visible="0">
+ <layer name="Board" width="64" height="46">
   <data>
    <tile gid="1"/>
    <tile gid="1"/>

@@ -29,23 +29,54 @@ game_board:             .rs (MAP_REAL_WIDTH * MAP_HEIGHT); 32 * 23 tiles
     ;.include "src/tiles.asm"
 
 ;-----------------------------------------------------------------------------------------
-; Copies the board static data to our map data in preparation for level loading
+; Put an object @a at @x, @y
 ;-----------------------------------------------------------------------------------------
-ClearBoard:
-    PUSH_ALL
-    ldx #(MAP_REAL_WIDTH * MAP_HEIGHT / 8)
-	lda #$00
-    clrmboard:
-	sta game_board, x
-	sta game_board + 92, x
-	sta game_board + 92 * 2, x
-	sta game_board + 92 * 3, x
-	sta game_board + 92 * 4, x
-	sta game_board + 92 * 5, x
-	sta game_board + 92 * 6, x
-	sta game_board + 92 * 7, x
-	dex
-	bne clrmboard
+PutObject:
+    stx tmp1
+    sty tmp1 + 1
+    asl A
+    tax
+    lda objects_data, x         ; Offset
+    sta tmp2
+    lda objects_data + 1, x     ; Width
+    and #%00001111
+    sta tmp3
+    lda objects_data + 1, x     ; Height
+    DIV16
+    sta tmp3 + 1
+
+    loopBoardRow:
+        ldx tmp1 + 1
+        LOAD_ADDR game_board, tmp5
+        PutObject_boardAddrLoop:
+            lda #MAP_REAL_WIDTH
+            ADD_TO_ADDR tmp5
+            dex
+            bne PutObject_boardAddrLoop
+
+        lda tmp1
+        ADD_TO_ADDR tmp5 
+
+        ldx tmp2
+        ldy #0
+        putObjRow_loop:
+            lda objects_data, x
+            inx
+            sta [tmp5], y
+            iny
+            cpy tmp3
+            bne putObjRow_loop
+        stx tmp2
+
+        ldx tmp1 + 1
+        inx
+        stx tmp1 + 1
+        ldx tmp3 + 1
+        dex
+        stx tmp3 + 1
+        bne loopBoardRow
+
+    rts
 
     ; 22, 29, 78, 84, 112, 116
 
@@ -73,6 +104,31 @@ ClearBoard:
     ldx #22
     lda #29
     sta game_board + (MAP_REAL_WIDTH * 11), x
+    rts
+
+;-----------------------------------------------------------------------------------------
+; Copies the board static data to our map data in preparation for level loading
+;-----------------------------------------------------------------------------------------
+ClearBoard:
+    PUSH_ALL
+    ldx #(MAP_REAL_WIDTH * MAP_HEIGHT / 8)
+	lda #$00
+    clrmboard:
+	sta game_board, x
+	sta game_board + 92, x
+	sta game_board + 92 * 2, x
+	sta game_board + 92 * 3, x
+	sta game_board + 92 * 4, x
+	sta game_board + 92 * 5, x
+	sta game_board + 92 * 6, x
+	sta game_board + 92 * 7, x
+	dex
+	bne clrmboard
+
+    lda #17 ; 3x2 Table
+    ldx #8
+    ldy #7
+    jsr PutObject
 
     POP_ALL
     rts

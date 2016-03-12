@@ -16,7 +16,7 @@ struct Object
     int width;
     int height;
     int id;
-    std::vector<uint8_t> data;
+    std::vector<uint32_t> data;
 };
 
 using ObjectRef = std::shared_ptr<Object>;
@@ -62,6 +62,20 @@ void loadTiles(Layer& layer, const std::string& name, tinyxml2::XMLElement* pXML
     }
 }
 
+uint8_t getTileId(const Tileset& tileset, int tileHash)
+{
+    uint8_t index = 0;
+    for (auto& tile : tileset)
+    {
+        if (tileHash == tile)
+        {
+            break;
+        }
+        index++;
+    }
+    return index;
+}
+
 void saveBoard(const Tileset& tileset, tinyxml2::XMLElement* pXMLmap)
 {
     Layer board;
@@ -78,15 +92,7 @@ void saveBoard(const Tileset& tileset, tinyxml2::XMLElement* pXMLmap)
             tile |= board[(j * 2 + 0) * MAP_WIDTH + (i * 2 + 1)] << 8;
             tile |= board[(j * 2 + 1) * MAP_WIDTH + (i * 2 + 0)] << 16;
             tile |= board[(j * 2 + 1) * MAP_WIDTH + (i * 2 + 1)] << 24;
-            uint8_t index = 0;
-            for (auto& tile2 : tileset)
-            {
-                if (tile == tile2)
-                {
-                    break;
-                }
-                index++;
-            }
+            auto index = getTileId(tileset, tile);
             fwrite(&index, 1, 1, pFic);
         }
     }
@@ -106,18 +112,22 @@ Objects loadObjects(const std::string& layerName, tinyxml2::XMLElement* pXMLmap)
         ObjectRef object = std::make_shared<Object>();
 
         object->id = pXMLobject->IntAttribute("id");
-        object->width = pXMLobject->IntAttribute("width") / 8;
-        object->height = pXMLobject->IntAttribute("height") / 8;
+        object->width = pXMLobject->IntAttribute("width") / 16;
+        object->height = pXMLobject->IntAttribute("height") / 16;
         object->data.resize(object->width * object->height);
 
-        auto x = pXMLobject->IntAttribute("x");
-        auto y = pXMLobject->IntAttribute("y");
+        auto x = pXMLobject->IntAttribute("x") / 16;
+        auto y = pXMLobject->IntAttribute("y") / 16;
 
         for (int j = 0; j < object->height; ++j)
         {
             for (int i = 0; i < object->width; ++i)
             {
-                object->data[j * object->width + i] = objectsLayer[(j + y) * MAP_WIDTH + (i + x)];
+                uint32_t tile = objectsLayer[((j + y) * 2 + 0) * MAP_WIDTH + ((i + x) * 2 + 0)];
+                tile |= objectsLayer[((j + y) * 2 + 0) * MAP_WIDTH + ((i + x) * 2 + 1)] << 8;
+                tile |= objectsLayer[((j + y) * 2 + 1) * MAP_WIDTH + ((i + x) * 2 + 0)] << 16;
+                tile |= objectsLayer[((j + y) * 2 + 1) * MAP_WIDTH + ((i + x) * 2 + 1)] << 24;
+                object->data[j * object->width + i] = tile;
             }
         }
 
@@ -127,27 +137,29 @@ Objects loadObjects(const std::string& layerName, tinyxml2::XMLElement* pXMLmap)
     return objects;
 }
 
-void saveObjects(const Objects& objects)
+void saveObjects(const Tileset& tileset, const Objects& objects)
 {
     FILE* pFic;
     fopen_s(&pFic, "assets/objects.bin", "wb");
-
-    int currentOffset = static_cast<int>(objects.size()) * 2;
-
-    // Table
+    
+    uint8_t totalSize = 0;
+    auto currentOffset = static_cast<uint8_t>(objects.size()) * 2;
     for (auto& object : objects)
     {
-        uint16_t offset = static_cast<uint16_t>(currentOffset);
-        fwrite(&offset, 2, 1, pFic);
-        currentOffset += static_cast<int>(object->data.size()) + 1;
+        fwrite(&currentOffset, 1, 1, pFic);
+        auto wh = static_cast<uint8_t>(object->width);
+        wh |= static_cast<uint8_t>(object->height) << 4;
+        fwrite(&wh, 1, 1, pFic);
+        totalSize += static_cast<uint8_t>(object->width * object->height);
+        currentOffset += static_cast<uint8_t>(object->width * object->height);
     }
-
-    // Objects data
     for (auto& object : objects)
     {
-        uint8_t width = static_cast<uint8_t>(object->width);
-        fwrite(&width, 1, 1, pFic);
-        fwrite(object->data.data(), 1, object->data.size(), pFic);
+        for (auto& tile : object->data)
+        {
+            auto index = getTileId(tileset, tile);
+            fwrite(&index, 1, 1, pFic);
+        }
     }
 
     fclose(pFic);
@@ -236,7 +248,7 @@ int main()
     saveBoard(tileset, pXMLmap);
 
     auto objects = loadObjects("Objects", pXMLmap);
-    //saveObjects(objects);
+    saveObjects(tileset, objects);
 
     //Layer sprites;
     //loadTiles(sprites, "Sprites", pXMLmap, 0);
