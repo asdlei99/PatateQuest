@@ -5,3 +5,7 @@ tileset4_data: .incbin "assets/tileset4.bin"
 board_data: .incbin "assets/board.bin"
 objects_data: .incbin "assets/objects.bin"
 board_pal: .incbin "assets/board.pal"
+
+quest0_data: .incbin "assets/quest0.bin"
+
+quests: .dw quest0_data

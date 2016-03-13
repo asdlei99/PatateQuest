@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\src\Enchanteur.cpp">
       <Filter>entities\characteres\heroes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NESEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Board.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="..\..\src\Enchanteur.h">
       <Filter>entities\characteres\heroes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\NESEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="entities">

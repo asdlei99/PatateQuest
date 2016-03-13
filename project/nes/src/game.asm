@@ -78,34 +78,6 @@ PutObject:
 
     rts
 
-    ; 22, 29, 78, 84, 112, 116
-
-    ;--- TEMP, put a table somewhere
-    ldx #20
-    lda #109
-    sta game_board + (MAP_REAL_WIDTH * 10), x
-
-    ldx #21
-    lda #84
-    sta game_board + (MAP_REAL_WIDTH * 10), x
-
-    ldx #22
-    lda #22
-    sta game_board + (MAP_REAL_WIDTH * 10), x
-
-    ldx #20
-    lda #112
-    sta game_board + (MAP_REAL_WIDTH * 11), x
-
-    ldx #21
-    lda #116
-    sta game_board + (MAP_REAL_WIDTH * 11), x
-
-    ldx #22
-    lda #29
-    sta game_board + (MAP_REAL_WIDTH * 11), x
-    rts
-
 ;-----------------------------------------------------------------------------------------
 ; Copies the board static data to our map data in preparation for level loading
 ;-----------------------------------------------------------------------------------------
@@ -125,12 +97,47 @@ ClearBoard:
 	dex
 	bne clrmboard
 
-    lda #17 ; 3x2 Table
-    ldx #8
-    ldy #7
-    jsr PutObject
-
     POP_ALL
+    rts
+
+;-----------------------------------------------------------------------------------------
+; Loads a quest id @a
+;-----------------------------------------------------------------------------------------
+LoadQuest:
+    asl A
+    tax
+    lda quests, x
+    sta tmp6
+    lda quests + 1, x
+    sta tmp6 + 1
+
+    ldy #0
+    lda [tmp6], y
+    iny
+    tax
+    objectLoop:
+        stx tmp7
+
+        lda [tmp6], y   ; Object Id
+        iny
+        sta tmp8
+        lda [tmp6], y   ; X
+        iny
+        tax
+        lda [tmp6], y   ; Y
+        iny
+        sty tmp7 + 1
+        tay
+        lda tmp8
+        jsr PutObject   ; Function call
+
+        ldx tmp7
+        ldy tmp7 + 1
+        lda [tmp6], y   ; Extra padding, reserved
+        iny
+        dex
+        bne objectLoop
+
     rts
 
 ;-----------------------------------------------------------------------------------------
@@ -518,6 +525,8 @@ OnInit:
 
     ;--- load board
     jsr ClearBoard
+    lda #0
+    jsr LoadQuest
     jsr RefreshScreen
 
     ;--- palettes
