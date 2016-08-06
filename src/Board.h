@@ -3,8 +3,7 @@
 
 #include <onut/Maths.h>
 #include <onut/Point.h>
-
-#include "TimingUtils.h"
+#include <onut/Timer.h>
 
 #include <micropather/micropather.h>
 

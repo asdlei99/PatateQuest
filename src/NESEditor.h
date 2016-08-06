@@ -2,6 +2,7 @@
 
 #include "onut/Maths.h"
 
+#include <set>
 #include <vector>
 
 #include "onut/ForwardDeclaration.h"
@@ -52,4 +53,5 @@ private:
     Object* m_pSelectedObject = nullptr;
     ObjectInstances m_objectInstances;
     int m_questId = 0;
+    std::set<Chr> m_usedChr;
 };

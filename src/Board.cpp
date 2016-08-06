@@ -34,6 +34,7 @@
 #include <onut/Font.h>
 #include <onut/Input.h>
 #include <onut/Log.h>
+#include <onut/PrimitiveBatch.h>
 #include <onut/SpriteAnim.h>
 #include <onut/Texture.h>
 
@@ -1059,15 +1060,15 @@ void Board::render()
         return a->getPosition().y < b->getPosition().y;
     });
 
-    OSB->begin(getTransform());
-    OSB->changeFiltering(OFilterNearest);
-    OSB->drawSprite(m_pBoardTexture, Vector2::Zero, Color::White, Vector2::Zero);
-    OSB->end();
+    oSpriteBatch->begin(getTransform());
+    oSpriteBatch->changeFiltering(OFilterNearest);
+    oSpriteBatch->drawSprite(m_pBoardTexture, Vector2::Zero, Color::White, Vector2::Zero);
+    oSpriteBatch->end();
 
     if (m_editorMode)
     {
-        OSB->begin(getTransform());
-        OSB->changeFiltering(OFilterNearest);
+        oSpriteBatch->begin(getTransform());
+        oSpriteBatch->changeFiltering(OFilterNearest);
         for (auto& pEntity : m_entities)
         {
             if (m_editorMode)
@@ -1075,30 +1076,30 @@ void Board::render()
                 pEntity->render();
             }
         }
-        OSB->end();
+        oSpriteBatch->end();
         auto pMouseHoverRoom = getRoomAt(getMouseOnBoard());
         if (pMouseHoverRoom)
         {
-            OPB->begin(OPrimitiveLineList, nullptr, getTransform());
+            oPrimitiveBatch->begin(OPrimitiveLineList, nullptr, getTransform());
             auto& outline = pMouseHoverRoom->getOutline();
             for (auto& line : outline)
             {
-                OPB->draw(Vector2(static_cast<float>(line.first.x * TILE_SIZE), static_cast<float>(line.first.y * TILE_SIZE)), Color(1, 0, 0, 1));
-                OPB->draw(Vector2(static_cast<float>(line.second.x * TILE_SIZE), static_cast<float>(line.second.y * TILE_SIZE)), Color(1, 0, 0, 1));
+                oPrimitiveBatch->draw(Vector2(static_cast<float>(line.first.x * TILE_SIZE), static_cast<float>(line.first.y * TILE_SIZE)), Color(1, 0, 0, 1));
+                oPrimitiveBatch->draw(Vector2(static_cast<float>(line.second.x * TILE_SIZE), static_cast<float>(line.second.y * TILE_SIZE)), Color(1, 0, 0, 1));
             }
-            OPB->end();
+            oPrimitiveBatch->end();
         }
     }
     else
     {
-        OSB->begin(getTransform());
+        oSpriteBatch->begin(getTransform());
         for (int x = 0; x < BOARD_WIDTH; ++x)
         {
             for (int y = 0; y < BOARD_HEIGHT; ++y)
             {
                 if (!m_visibility[x][y])
                 {
-                    OSB->drawRect(nullptr,
+                    oSpriteBatch->drawRect(nullptr,
                                   {static_cast<float>(x * TILE_SIZE),
                                    static_cast<float>(y * TILE_SIZE), 
                                    static_cast<float>(TILE_SIZE),
@@ -1145,7 +1146,7 @@ void Board::render()
                     pEntity->getPosition().x >= BOARD_WIDTH || pEntity->getPosition().y >= BOARD_HEIGHT) continue;
                 if (pEntity->getPosition() == m_selection.pos)
                 {
-                    OSB->drawSpriteWithUVs(m_selection.anim->getTexture(),
+                    oSpriteBatch->drawSpriteWithUVs(m_selection.anim->getTexture(),
                                            Vector2(static_cast<float>(m_selection.pos.x * TILE_SIZE), static_cast<float>(m_selection.pos.y * TILE_SIZE)),
                                            m_selection.anim->getUVs(), Color::White, 0.f, 1.f, m_selection.anim->getOrigin());
                 }
@@ -1168,7 +1169,7 @@ void Board::render()
                 size.x = std::max(size.x, static_cast<int>(measurement.x) + 1);
                 size.y += TILE_SIZE;
             }
-            OSB->drawRectScaled9RepeatCenters(m_pContextMenuTexture,
+            oSpriteBatch->drawRectScaled9RepeatCenters(m_pContextMenuTexture,
                                               Rect(static_cast<float>(pos.x * TILE_SIZE - 6), static_cast<float>(pos.y * TILE_SIZE - 3),
                                                    static_cast<float>(size.x + 6 + 3), static_cast<float>(size.y + 3 + 6)),
                                               Vector4(6.f, 3.f, 3.f, 6.f));
@@ -1177,11 +1178,11 @@ void Board::render()
             {
                 if (option == "-")
                 {
-                    OSB->drawRect(nullptr,
+                    oSpriteBatch->drawRect(nullptr,
                                   Rect(static_cast<float>(pos.x * TILE_SIZE - 2), static_cast<float>(pos.y * TILE_SIZE + 7),
                                   static_cast<float>(size.x + 4), 1),
                                   OColorHex(527f39));
-                    OSB->drawRect(nullptr,
+                    oSpriteBatch->drawRect(nullptr,
                                   Rect(static_cast<float>(pos.x * TILE_SIZE - 2), static_cast<float>(pos.y * TILE_SIZE + 8),
                                   static_cast<float>(size.x + 4), 1),
                                   OColorHex(d7e894));
@@ -1192,7 +1193,7 @@ void Board::render()
                                        getMouseOnBoard().y == pos.y);
                     if (mouseHover)
                     {
-                        OSB->drawRect(nullptr,
+                        oSpriteBatch->drawRect(nullptr,
                                       Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                       static_cast<float>(size.x), 16),
                                       OColorHex(527f39));
@@ -1221,7 +1222,7 @@ void Board::render()
                 for (int i = 0; i < static_cast<int>(m_playerTurn.dice.size()); ++i)
                 {
                     auto& die = m_playerTurn.dice[i];
-                    OSB->drawRectWithUVs(m_pDiceTexture,
+                    oSpriteBatch->drawRectWithUVs(m_pDiceTexture,
                                          Rect(static_cast<float>(m_playerTurn.dicePos.x * TILE_SIZE + i * 32), static_cast<float>(m_playerTurn.dicePos.y * TILE_SIZE), 32, 32),
                                          Vector4(0, static_cast<float>((die - 1) * 32) / 192.f, 1, static_cast<float>(die * 32) / 192.f));
                 }
@@ -1303,7 +1304,7 @@ void Board::render()
                 break;
             }
         }
-        OSB->end();
+        oSpriteBatch->end();
     }
 }
 
@@ -1315,7 +1316,7 @@ void Board::drawDice()
         auto& die = m_playerTurn.dice[i];
         if (die)
         {
-            OSB->drawRectWithUVs(m_pDiceTexture,
+            oSpriteBatch->drawRectWithUVs(m_pDiceTexture,
                                  Rect(static_cast<float>(m_playerTurn.dicePos.x * TILE_SIZE + dieOffset * 32), static_cast<float>(m_playerTurn.dicePos.y * TILE_SIZE), 32, 32),
                                  Vector4(0, static_cast<float>((die - 1) * 32) / 192.f, 1, static_cast<float>(die * 32) / 192.f));
             ++dieOffset;
@@ -1325,7 +1326,7 @@ void Board::drawDice()
 
 void Board::drawArrowAt(const Point& pos)
 {
-    OSB->drawSpriteWithUVs(m_fleche.anim->getTexture(),
+    oSpriteBatch->drawSpriteWithUVs(m_fleche.anim->getTexture(),
                             Vector2(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE + 4)),
                             m_fleche.anim->getUVs(), Color::White, 0.f, 1.f, m_fleche.anim->getOrigin());
 }
@@ -1346,7 +1347,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             if ((prev == INVALID_PATH && next == pos + Point(0, 1)) ||
                 (next == INVALID_PATH && prev == pos + Point(0, 1)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(0, 0, 16.f / 64.f, 16.f / 64.f));
@@ -1354,7 +1355,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(0, 1) && next == pos + Point(1, 0)) ||
                      (next == pos + Point(0, 1) && prev == pos + Point(1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(16.f / 64.f, 0, 32.f / 64.f, 16.f / 64.f));
@@ -1362,7 +1363,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(0, 1) && next == pos + Point(-1, 0)) ||
                      (next == pos + Point(0, 1) && prev == pos + Point(-1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(32.f / 64.f, 0, 48.f / 64.f, 16.f / 64.f));
@@ -1370,7 +1371,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(0, -1) && next == pos + Point(0, 1)) ||
                      (next == pos + Point(0, -1) && prev == pos + Point(0, 1)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(0, 16.f / 64.f, 16.f / 64.f, 32.f / 64.f));
@@ -1378,7 +1379,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(0, -1) && next == pos + Point(1, 0)) ||
                      (next == pos + Point(0, -1) && prev == pos + Point(1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(16.f / 64.f, 16.f / 64.f, 32.f / 64.f, 32.f / 64.f));
@@ -1386,7 +1387,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(0, -1) && next == pos + Point(-1, 0)) ||
                      (next == pos + Point(0, -1) && prev == pos + Point(-1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(32.f / 64.f, 16.f / 64.f, 48.f / 64.f, 32.f / 64.f));
@@ -1394,7 +1395,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == INVALID_PATH && next == pos + Point(0, -1)) ||
                      (next == INVALID_PATH && prev == pos + Point(0, -1)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(0, 32.f / 64.f, 16.f / 64.f, 48.f / 64.f));
@@ -1402,7 +1403,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == INVALID_PATH && next == pos + Point(1, 0)) ||
                      (next == INVALID_PATH && prev == pos + Point(1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(16.f / 64.f, 32.f / 64.f, 32.f / 64.f, 48.f / 64.f));
@@ -1410,7 +1411,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == pos + Point(-1, 0) && next == pos + Point(1, 0)) ||
                      (next == pos + Point(-1, 0) && prev == pos + Point(1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(32.f / 64.f, 32.f / 64.f, 48.f / 64.f, 48.f / 64.f));
@@ -1418,7 +1419,7 @@ void Board::drawPathSection(const Point& at, const Path& path)
             else if ((prev == INVALID_PATH && next == pos + Point(-1, 0)) ||
                      (next == INVALID_PATH && prev == pos + Point(-1, 0)))
             {
-                OSB->drawRectWithUVs(m_pPathTexture,
+                oSpriteBatch->drawRectWithUVs(m_pPathTexture,
                                      Rect(static_cast<float>(pos.x * TILE_SIZE), static_cast<float>(pos.y * TILE_SIZE),
                                      static_cast<float>(TILE_SIZE), static_cast<float>(TILE_SIZE)),
                                      Vector4(48.f / 64.f, 32.f / 64.f, 64.f / 64.f, 48.f / 64.f));

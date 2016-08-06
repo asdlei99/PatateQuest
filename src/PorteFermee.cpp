@@ -28,7 +28,7 @@ void PorteFermee::render()
             m_origin = Vector2(3, 7);
             break;
     }
-    OSB->drawSprite(m_textures[m_direction],
+    oSpriteBatch->drawSprite(m_textures[m_direction],
                     Vector2(static_cast<float>(m_position.x * Board::TILE_SIZE), static_cast<float>(m_position.y * Board::TILE_SIZE)),
                     Color::White,
                     0.f,

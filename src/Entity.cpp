@@ -3,6 +3,7 @@
 
 #include "onut/Random.h"
 #include "onut/Texture.h"
+#include <onut/SpriteBatch.h>
 
 #include "onut_old.h"
 
@@ -86,7 +87,7 @@ void Entity::update()
 
 void Entity::render()
 {
-    OSB->drawSprite(m_textures[m_direction],
+    oSpriteBatch->drawSprite(m_textures[m_direction],
                     Vector2(static_cast<float>(m_position.x * Board::TILE_SIZE), static_cast<float>(m_position.y * Board::TILE_SIZE)),
                     Color::White,
                     0.f,

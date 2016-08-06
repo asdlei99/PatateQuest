@@ -248,7 +248,9 @@ void NESEditor::drawChr(Chr index, const Vector2& pos)
 {
     if (index == 0) return;
 
-    OSB->drawRectWithUVs(m_pCharTexture, {pos, 8, 8}, 
+    m_usedChr.insert(index);
+
+    oSpriteBatch->drawRectWithUVs(m_pCharTexture, {pos, 8, 8}, 
     {
         static_cast<float>(index % 16) / 16.f,
         static_cast<float>(index / 16) / 16.f,
@@ -276,8 +278,8 @@ void NESEditor::render()
 
     auto pFont = OGetFont("font.fnt");
 
-    OSB->begin();
-    OSB->changeFiltering(OFilterNearest);
+    oSpriteBatch->begin();
+    oSpriteBatch->changeFiltering(OFilterNearest);
 
     // Tileset
     pFont->draw("Tileset:", Vector2::Zero);
@@ -293,6 +295,37 @@ void NESEditor::render()
     auto maxY = pos.y;
     for (auto& object : m_objects)
     {
+        oSpriteBatch->drawRect(nullptr, {
+            static_cast<float>(pos.x * 16),
+            static_cast<float>(64 + 32 + pos.y * 16),
+            static_cast<float>(object.width * 16),
+            static_cast<float>(object.height * 16)},
+            Color(.25f, .25f, .25f, 1));
+        oSpriteBatch->drawRect(nullptr, {
+            static_cast<float>(pos.x * 16),
+            static_cast<float>(64 + 32 + pos.y * 16),
+            1,
+            static_cast<float>(object.height * 16)},
+            Color(.75f, .75f, .75f, 1));
+        oSpriteBatch->drawRect(nullptr, {
+            static_cast<float>((pos.x + object.width) * 16 - 1),
+            static_cast<float>(64 + 32 + pos.y * 16),
+            1,
+            static_cast<float>(object.height * 16)},
+            Color(.75f, .75f, .75f, 1));
+        oSpriteBatch->drawRect(nullptr, {
+            static_cast<float>(pos.x * 16),
+            static_cast<float>(64 + 32 + pos.y * 16),
+            static_cast<float>(object.width * 16),
+            1},
+            Color(.75f, .75f, .75f, 1));
+        oSpriteBatch->drawRect(nullptr, {
+            static_cast<float>(pos.x * 16),
+            static_cast<float>(64 + 32 + (pos.y + object.height) * 16 - 1),
+            static_cast<float>(object.width * 16),
+            1},
+            Color(.75f, .75f, .75f, 1));
+
         for (int y = 0; y < object.height; ++y)
         {
             for (int x = 0; x < object.width; ++x)
@@ -309,6 +342,8 @@ void NESEditor::render()
             pos.y = maxY;
         }
     }
+
+    m_usedChr.clear();
 
     // Board
     for (int y = 0; y < BOARD_HEIGHT; ++y)
@@ -339,7 +374,7 @@ void NESEditor::render()
     // Selected object, semi-transparent
     if (m_pSelectedObject)
     {
-        OSB->changeBlendMode(OBlendAdd);
+        oSpriteBatch->changeBlendMode(OBlendAdd);
         auto& object = *m_pSelectedObject;
         pos = oInput->mousePos / 16;
         for (int y = 0; y < object.height; ++y)
@@ -352,5 +387,13 @@ void NESEditor::render()
         }
     }
 
-    OSB->end();
+    // Chr
+    oSpriteBatch->drawRect(m_pCharTexture, {OScreenWf - 256, 256, 256, 256});
+    oSpriteBatch->changeBlendMode(OBlendPreMultiplied);
+    for (auto& chr : m_usedChr)
+    {
+        oSpriteBatch->drawRect(nullptr, {OScreenWf - 256 + static_cast<float>((chr % 16) * 16), 256 + static_cast<float>((chr / 16) * 16), 16, 16}, Color(0, .5f, 0, 0));
+    }
+
+    oSpriteBatch->end();
 }

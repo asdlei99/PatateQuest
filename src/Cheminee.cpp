@@ -15,7 +15,7 @@ Cheminee::Cheminee(const Point& position, Direction direction)
 
 void Cheminee::render()
 {
-    OSB->drawSpriteWithUVs(m_pSpriteAnim->getTexture(),
+    oSpriteBatch->drawSpriteWithUVs(m_pSpriteAnim->getTexture(),
                            Vector2(static_cast<float>(m_position.x * Board::TILE_SIZE), static_cast<float>(m_position.y * Board::TILE_SIZE)),
                            m_pSpriteAnim->getUVs(),
                            Color::White,

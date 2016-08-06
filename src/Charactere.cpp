@@ -75,7 +75,7 @@ void Charactere::wakeUp()
 
 void Charactere::render()
 {
-    OSB->drawSpriteWithUVs(m_spriteAnimInstance.getTexture(),
+    oSpriteBatch->drawSpriteWithUVs(m_spriteAnimInstance.getTexture(),
                            Vector2(static_cast<float>(m_position.x * Board::TILE_SIZE + m_moveAnim.get().x),
                            static_cast<float>(m_position.y * Board::TILE_SIZE + m_moveAnim.get().y)),
                            m_spriteAnimInstance.getUVs(),
